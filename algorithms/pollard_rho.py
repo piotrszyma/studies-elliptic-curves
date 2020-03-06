@@ -2,6 +2,8 @@ import dataclasses
 import random
 import itertools
 
+from typing import Tuple
+
 from utils import primegen
 from utils import timer
 
@@ -49,7 +51,7 @@ class PollardRhoDL:
     def __init__(self, params: PollardRhoDLParams):
         self.params = params
 
-    def _f(self, values: (int, Point)) -> (int, Point):
+    def _f(self, values: Tuple[int, Point]) -> Tuple[int, Point]:
         value, poe = values
         if _in_s1(value):
             poe.beta += 1
