@@ -20,9 +20,9 @@ import argparse
 from algorithms import pollard_rho
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--genparams', '-g', action='store_true', default=False)
-parser.add_argument('--nbits', '-n', type=int, default=40)
-parser.add_argument('--fromstdin', '-in',  action='store_true', default=False)
+parser.add_argument("--genparams", "-g", action="store_true", default=False)
+parser.add_argument("--nbits", "-n", type=int, default=40)
+parser.add_argument("--fromstdin", "-in", action="store_true", default=False)
 
 
 def main():
@@ -30,10 +30,7 @@ def main():
 
     if args.fromstdin:
         params = pollard_rho.PollardRhoDLParams(
-            g_prim=int(input()),
-            p=int(input()),
-            p_prim=int(input()),
-            y=int(input()),
+            g_prim=int(input()), p=int(input()), p_prim=int(input()), y=int(input()),
         )
     else:
         params = pollard_rho.generate_params(args.nbits)
@@ -46,7 +43,9 @@ def main():
         return
     else:
         print(f"Running for {params}")
+
         x_found = pollard_rho.PollardRhoDL(params).run()
+
         print(f"x_found: {x_found}")
         print(f"g_prim ^ x_found: {pow(params.g_prim, x_found, params.p)}")
         print(f"y: {params.y}")

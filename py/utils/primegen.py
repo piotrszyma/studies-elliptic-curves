@@ -8,7 +8,7 @@ class FailedToCreatePrimeError:
     pass
 
 
-def random_safe_prime(bits=40):
+def random_safe_prime(bits):
     assert 3 <= bits <= 64
     command = f"openssl dhparam -text {bits}"
     result = subprocess.run(command.split(" "), capture_output=True)

@@ -42,6 +42,7 @@ void testPollardRho()
             << "y: " << y_str << std::endl;
 
   PollardRho instance{g_prim, p_prim, p, y};
+
   Number x = instance.run();
 
   std::cout << "x_found: " << x.getValue() << std::endl;

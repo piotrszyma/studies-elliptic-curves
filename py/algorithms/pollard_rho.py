@@ -1,6 +1,5 @@
 import dataclasses
 import random
-import itertools
 
 from typing import Tuple
 

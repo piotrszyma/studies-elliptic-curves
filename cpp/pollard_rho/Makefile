@@ -1,6 +1,6 @@
 CC = g++
 OPTIONS = -Wall -std=c++17
-INCLUDES = -I . -I/usr/local/opt/openssl/include
+INCLUDES = -I .
 LIBS = -lgmp -lgmpxx
 BIN = pollard_rho
 .PHONY: all clean
