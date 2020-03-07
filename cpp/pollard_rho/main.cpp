@@ -15,15 +15,7 @@ void testPollardRho() {
   std::cout << x.getValue() << std::endl;
 }
 
-void testNumber() {
-  Number a {"8"};
-  // Number b {"3"};
-  Number c = a % 3;
-  std::cout << c.getValue() << std::endl;
-}
-
 int main(void) {
-  // testNumber(); 
   testPollardRho();
   return 0;
 }

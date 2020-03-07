@@ -5,6 +5,11 @@ Number::Number(const std::string value_)
 {
   mpz_init_set_str(this->value.get_mpz_t(), value_.c_str(), 10);
 }
+
+Number::Number(const uint64_t value_)
+{
+  mpz_init_set_ui(this->value.get_mpz_t(), value_);
+}
 Number::Number(mpz_class value_) : value(value_){};
 
 mpz_class Number::getValue()

@@ -36,11 +36,11 @@ PollardRho::PollardRho(Number g_prim_, Number p_prim_, Number p_, Number y_) : g
 
 Number PollardRho::walk()
 {
-  Number A{"1"};
-  Number B{"1"};
+  Number A{1};
+  Number B{1};
 
-  Point poeA{{"0"}, {"0"}};
-  Point poeB{{"0"}, {"0"}};
+  Point poeA{{0}, {0}};
+  Point poeB{{0}, {0}};
 
   int i = 0;
 

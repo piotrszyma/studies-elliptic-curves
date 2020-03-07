@@ -9,6 +9,7 @@ class Number {
     mpz_class value;
 
   public:
+    Number(uint64_t value_);
     Number(std::string value_);
     Number(mpz_class value_);
 
