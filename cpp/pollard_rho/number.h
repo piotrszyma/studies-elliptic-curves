@@ -13,21 +13,25 @@ class Number {
     Number(mpz_class value_);
 
     mpz_class getValue();
-    mpz_class getModulus();
+
+    Number modpow(Number exp, Number mod);
 
     Number operator + (Number anotherNumber);
-
+    Number operator + (uint64_t intNumber);
+    
     Number operator - (Number anotherNumber);
-
-    // Number operator - ();
+    Number operator - (int intNumber);
 
     Number operator * (Number anotherNumber);
+    Number operator * (uint64_t intNumber);
 
     Number operator / (Number anotherNumber);
 
     Number operator % (Number anotherNumber);
+    Number operator % (uint64_t intNumber);
 
     bool operator == (Number anotherNumber);
+    bool operator == (uint64_t intNumber);
 
     bool operator != (Number anotherNumber);
 };

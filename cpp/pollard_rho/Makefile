@@ -1,5 +1,5 @@
 CC = g++
-OPTIONS = -Wall -std=c++14
+OPTIONS = -Wall -std=c++17
 INCLUDES = -I . -I/usr/local/opt/openssl/include
 LIBS = -lgmp -lgmpxx
 BIN = out
