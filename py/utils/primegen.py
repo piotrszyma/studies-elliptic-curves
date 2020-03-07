@@ -17,3 +17,7 @@ def random_safe_prime(bits=40):
         raise FailedToCreatePrimeError
 
     return int(RE_PRIME.search(result.stdout).group("value"))
+
+
+if __name__ == "__main__":
+    print(random_safe_prime())
