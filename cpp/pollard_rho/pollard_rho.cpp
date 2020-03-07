@@ -19,12 +19,14 @@ std::tuple<Number, Point> PollardRho::f(std::tuple<Number, Point> values)
     beta = beta * 2;
     num = (num * num) % p;
   }
-  else if(num % 3 == 2)
+  else if (num % 3 == 2)
   { // num % 3 == 2
     alpha = alpha + 1;
     num = (g_prim * num) % p;
-  } else {
-    throw std::runtime_error("Impossible happend");
+  }
+  else
+  {
+    throw std::runtime_error("Impossible happend - num % 3 not in [0, 1, 2]?");
   }
 
   return {num, {alpha, beta}};
@@ -54,10 +56,9 @@ Number PollardRho::walk()
   auto [alphaA, betaA] = poeA;
   auto [alphaB, betaB] = poeB;
 
+  auto betasInvs = (betaA - betaB).modpow(p_prim - 2, p_prim);
+  auto alphasDeltas = alphaB - alphaA;
 
-  Number betasInvs = (betaA - betaB).modpow(p_prim - 2, p_prim);
-  Number alphasDeltas = alphaB - alphaA;
-  
   return (alphasDeltas * betasInvs) % p_prim;
 }
 
