@@ -42,15 +42,10 @@ Number PollardRho::walk()
   Point poeA{{0}, {0}};
   Point poeB{{0}, {0}};
 
-  int i = 0;
-
   do
   {
-    i++;
-
     std::tie(A, poeA) = f({A, poeA});
     std::tie(B, poeB) = f(f({B, poeB}));
-
   } while (A != B);
 
   auto [alphaA, betaA] = poeA;

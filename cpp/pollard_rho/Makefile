@@ -2,7 +2,7 @@ CC = g++
 OPTIONS = -Wall -std=c++17
 INCLUDES = -I . -I/usr/local/opt/openssl/include
 LIBS = -lgmp -lgmpxx
-BIN = out
+BIN = pollard_rho
 .PHONY: all clean
 OBJS = main.o pollard_rho.o number.o
 

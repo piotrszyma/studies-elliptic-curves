@@ -22,8 +22,8 @@ class Point:
     beta: int = 0
 
 
-def generate_params() -> PollardRhoDLParams:
-    p = primegen.random_safe_prime()
+def generate_params(bits: int = 40) -> PollardRhoDLParams:
+    p = primegen.random_safe_prime(bits)
     p_prim = (p - 1) // 2
 
     g = random.randint(2, p - 1)
@@ -71,9 +71,8 @@ class PollardRhoDL:
         B = 1
         poeA = Point()
         poeB = Point()
-        i = 1
 
-        for i in itertools.count():
+        while True:
 
             A, poeA = self._f((A, poeA))
             B, poeB = self._f(self._f((B, poeB)))
