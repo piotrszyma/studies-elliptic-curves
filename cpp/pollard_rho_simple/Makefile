@@ -2,9 +2,9 @@ CC = g++
 OPTIONS = -Wall -std=c++17 -O3
 INCLUDES = -I .
 LIBS = -lgmp -lgmpxx
-BIN = pollard_rho
+BIN = pollard_rho_simple
 .PHONY: all clean
-OBJS = main.o pollard_rho_mpz.o
+OBJS = main.o pollard_rho_simple.o
 
 all: ${OBJS}
 	${CC} ${OPTIONS} -lgmp -lgmpxx ${OBJS} -o ${BIN}

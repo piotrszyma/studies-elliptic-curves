@@ -23,27 +23,10 @@ inline void f(mpz_class *num, mpz_class *alpha, mpz_class *beta, mpz_class *y, m
   default:
     throw std::runtime_error("x % 3 not in [0, 1, 2]?");
   }
-  // *num= *num + *num;
 }
 
 mpz_class pollard_rho_mpz(mpz_class g_prim, mpz_class p, mpz_class p_prim, mpz_class y)
 {
-
-  //  MP_INT B;
-  //  MP_INT alphaA;
-  //  MP_INT betaA;
-  //  MP_INT alphaB;
-  //  MP_INT betaB;
-  //  MP_INT A;
-  //  mpz_init_set_ui(&A, 10000U);
-
-  // MP_INT B;
-  //  mpz_init_set_ui(&B, 5000U);
-
-  //   mpz_mod(&B, &B, &A);
-
-  //   gmp_printf(&B)
-
   mpz_class A(1);
   mpz_class B(1);
   mpz_class alphaA(0);
@@ -51,7 +34,6 @@ mpz_class pollard_rho_mpz(mpz_class g_prim, mpz_class p, mpz_class p_prim, mpz_c
   mpz_class alphaB(0);
   mpz_class betaB(0);
 
-  // f(A, alphaA, betaA, y, p, g_prim);
   do
   {
     f(&A, &alphaA, &betaA, &y, &p, &g_prim);
