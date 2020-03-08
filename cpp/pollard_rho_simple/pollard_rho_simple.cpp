@@ -8,17 +8,20 @@ inline void f(mpz_class *num, mpz_class *alpha, mpz_class *beta, mpz_class *y, m
   switch (res.get_ui())
   {
   case 1:
-    *beta = *beta + 1;
-    *num = (*num * *y) % *p;
+    *beta += 1;
+    *num *= *y;
+    *num %= *p;
     break;
   case 0:
-    *alpha = *alpha * 2;
-    *beta = *beta * 2;
-    *num = (*num * *num) % *p;
+    *alpha *= 2;
+    *beta *= 2;
+    *num *= *num;
+    *num %= *p;
     break;
   case 2:
-    *alpha = *alpha + 1;
-    *num = (*g_prim * *num) % *p;
+    *alpha += 1;
+    *num *= *g_prim;
+    *num %= *p;
     break;
   default:
     throw std::runtime_error("x % 3 not in [0, 1, 2]?");

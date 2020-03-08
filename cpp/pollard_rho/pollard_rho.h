@@ -13,7 +13,7 @@ class PollardRho {
     Number y;
 
     Number walk();
-    void f(Number* value, Number* alpha, Number *beta);
+    inline void f(Number* value, Number* alpha, Number *beta);
 
   public:
     PollardRho(Number g_prim_, Number p_prim_, Number p_, Number y_);

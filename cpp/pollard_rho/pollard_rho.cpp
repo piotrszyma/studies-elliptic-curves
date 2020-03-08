@@ -2,7 +2,7 @@
 
 #include "number.h"
 #include "pollard_rho.h"
-void PollardRho::f(Number* value, Number* alpha, Number *beta)
+inline void PollardRho::f(Number* value, Number* alpha, Number *beta)
 {
 
   Number res = *value % 3;
