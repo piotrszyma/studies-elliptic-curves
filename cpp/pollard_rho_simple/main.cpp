@@ -18,7 +18,7 @@ python3 ../../py/main.py --genparams --nbits 40 40 | ./pollard_rho
 
 #include <gmpxx.h>
 
-#include "pollard_rho_mpz.h"
+#include "pollard_rho_simple.h"
 
 
 void testPollardRhoMpz()
