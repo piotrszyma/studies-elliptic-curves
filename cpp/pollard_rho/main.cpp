@@ -16,10 +16,12 @@ python3 ../../py/main.py --genparams --nbits 40 40 | ./pollard_rho
 
 #include <iostream>
 
-#include "number.h"
-#include "pollard_rho.h"
+#include <gmpxx.h>
 
-void testPollardRho()
+#include "pollard_rho_simple.h"
+
+
+void testPollardRhoMpz()
 {
   std::string g_prim_str;
   std::cin >> g_prim_str;
@@ -30,28 +32,31 @@ void testPollardRho()
   std::string y_str;
   std::cin >> y_str;
 
-  Number g_prim{g_prim_str};
-  Number p{p_str};
-  Number p_prim{p_prim_str};
-  Number y{y_str};
-
   std::cout << "Running for "
             << "g_prim: " << g_prim_str << " "
             << "p: " << p_str << " "
             << "p_prim: " << p_prim_str << " "
             << "y: " << y_str << std::endl;
 
-  PollardRho instance{g_prim, p_prim, p, y};
+  mpz_class g_prim(g_prim_str, 10);
+  mpz_class p(p_str, 10);
+  mpz_class p_prim(p_prim_str, 10);
+  mpz_class y(y_str, 10);
 
-  Number x = instance.run();
+  mpz_class x_found = pollard_rho_mpz(&g_prim, &p, &p_prim, &y);
+  
+  std::cout << "x_found: " << x_found << std::endl;
 
-  std::cout << "x_found: " << x.getValue() << std::endl;
-  std::cout << "g_prim ^ x_found: " << g_prim.modpow(x, p).getValue() << std::endl;
-  std::cout << "y: " << y.getValue() << std::endl;
+  mpz_class result;
+  mpz_powm(result.get_mpz_t(), g_prim.get_mpz_t(), x_found.get_mpz_t(), p.get_mpz_t());
+  std::cout << "g_prim ^ x_found: " << result << std::endl;
+
+  std::cout << "y: " << y << std::endl;
 }
 
 int main(void)
 {
-  testPollardRho();
+  // testPollardRho();
+  testPollardRhoMpz();
   return 0;
 }
