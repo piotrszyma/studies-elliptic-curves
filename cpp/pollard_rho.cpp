@@ -6,9 +6,7 @@ namespace PollardRho
 
 inline void f(mpz_class *num, mpz_class *alpha, mpz_class *beta, mpz_class *y, mpz_class *p, mpz_class *g_prim)
 {
-  mpz_class res = *num % 3;
-
-  switch (res.get_ui())
+  switch (mpz_class res = *num % 3; res.get_ui())
   {
   case 1:
     *beta += 1;
