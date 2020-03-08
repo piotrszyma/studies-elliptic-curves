@@ -43,7 +43,7 @@ void testPollardRhoMpz()
   mpz_class p_prim(p_prim_str, 10);
   mpz_class y(y_str, 10);
 
-  mpz_class x_found = pollard_rho_mpz(g_prim, p, p_prim, y);
+  mpz_class x_found = pollard_rho_mpz(&g_prim, &p, &p_prim, &y);
   
   std::cout << "x_found: " << x_found << std::endl;
 

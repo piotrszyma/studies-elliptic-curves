@@ -25,7 +25,7 @@ inline void f(mpz_class *num, mpz_class *alpha, mpz_class *beta, mpz_class *y, m
   }
 }
 
-mpz_class pollard_rho_mpz(mpz_class g_prim, mpz_class p, mpz_class p_prim, mpz_class y)
+mpz_class pollard_rho_mpz(mpz_class *g_prim, mpz_class *p, mpz_class *p_prim, mpz_class *y)
 {
   mpz_class A(1);
   mpz_class B(1);
@@ -36,15 +36,15 @@ mpz_class pollard_rho_mpz(mpz_class g_prim, mpz_class p, mpz_class p_prim, mpz_c
 
   do
   {
-    f(&A, &alphaA, &betaA, &y, &p, &g_prim);
-    f(&B, &alphaB, &betaB, &y, &p, &g_prim);
-    f(&B, &alphaB, &betaB, &y, &p, &g_prim);
+    f(&A, &alphaA, &betaA, y, p, g_prim);
+    f(&B, &alphaB, &betaB, y, p, g_prim);
+    f(&B, &alphaB, &betaB, y, p, g_prim);
   } while (A != B);
 
   mpz_class betasInv;
   mpz_class betaDeltas;
   betaDeltas = betaA - betaB;
-  mpz_class p_primMinTwo = p_prim - 2;
-  mpz_powm(betasInv.get_mpz_t(), betaDeltas.get_mpz_t(), p_primMinTwo.get_mpz_t(), p_prim.get_mpz_t());
-  return ((alphaB - alphaA) * betasInv) % p_prim;
+  mpz_class p_primMinTwo = *p_prim - 2;
+  mpz_powm(betasInv.get_mpz_t(), betaDeltas.get_mpz_t(), p_primMinTwo.get_mpz_t(), (*p_prim).get_mpz_t());
+  return ((alphaB - alphaA) * betasInv) % *p_prim;
 }

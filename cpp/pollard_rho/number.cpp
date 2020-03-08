@@ -74,8 +74,7 @@ Number Number::operator/(Number anotherNumber)
 
 Number Number::operator%(Number anotherNumber)
 {
-  mpz_class result;
-  mpz_mod(result.get_mpz_t(), getValue().get_mpz_t(), anotherNumber.getValue().get_mpz_t());
+  mpz_class result = getValue() % anotherNumber.getValue();
   return Number(result);
 }
 Number Number::operator%(uint64_t intNumber)

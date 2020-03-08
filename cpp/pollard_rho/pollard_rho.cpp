@@ -5,18 +5,20 @@
 void PollardRho::f(Number* value, Number* alpha, Number *beta)
 {
 
-  if (*value % 3 == 1)
+  Number res = *value % 3;
+
+  if (res == 1)
   {
     *beta = *beta + 1;
     *value = (*value * y) % p;
   }
-  else if (*value % 3 == 0)
+  else if (res == 0)
   {
     *alpha = *alpha * 2;
     *beta = *beta * 2;
     *value = (*value * *value) % p;
   }
-  else if (*value % 3 == 2)
+  else if (res == 2)
   { // num % 3 == 2
     *alpha = *alpha + 1;
     *value = (g_prim * *value) % p;
@@ -42,8 +44,8 @@ Number PollardRho::walk()
   do
   {
     f(&A, &alphaA, &betaA);
-    f(&B, &betaA, &betaB);
-    f(&B, &betaA, &betaB);
+    f(&B, &alphaB, &betaB);
+    f(&B, &alphaB, &betaB);
   } while (A != B);
 
 
