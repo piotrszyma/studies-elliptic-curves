@@ -1,26 +1,31 @@
+use num_bigint::BigUint;
 use std::io;
-use num_bigint::{BigUint};
 
-const ZERO: BigUint= BigUint::from(0 as u8);
-const ONE: BigUint = BigUint::from(0 as u8);
-const TWO: BigUint = BigUint::from(0 as u8);
-const THREE: BigUint = BigUint::from(3 as u8);
+fn step(
+    value: &BigUint,
+    alpha: &BigUint,
+    beta: &BigUint,
+    y: &BigUint,
+    p: &BigUint,
+    g_prim: &BigUint,
+) -> () {
+    let res: &BigUint = &(value % BigUint::from(3 as u8));
 
-fn step(value: &BigUint, alpha: &BigUint, beta: &BigUint, y: &BigUint, p: &BigUint, g_prim: &BigUint) {
-    match value % THREE {
-        ZERO => {
-
-        },
-        ONE => {
-
-        },
-        TWO => {
-
-        }
+    if { res == &BigUint::from(0 as u8) } {
+        let mut alpha = &(alpha  + BigUint::from(1 as u8));
+        let mut value = &((value * y) % p);
+    } else if { res == &BigUint::from(1 as u8) } {
+        let mut alpha = &(alpha * BigUint::from(2 as u8));
+        let mut beta = &(beta * BigUint::from(2 as u8));
+        let mut value = &((value ^  BigUint::from(2 as u8)) % p);
+    } else if { res == &BigUint::from(2 as u8) } {
+        let mut beta = &(beta  + BigUint::from(1 as u8));
+        let mut value = &((value * g_prim) % p);
     }
+    return;
 }
 
-fn pollard_rho_mpz(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint) -> BigUint {
+fn pollard_rho_mpz(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint) {
     println!("{}", g_prim);
     println!("{}", p);
     println!("{}", p_prim);
@@ -36,14 +41,15 @@ fn pollard_rho_mpz(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint) -> 
     let mut betaB = BigUint::from(0 as u8);
 
     loop {
-        A = A;
-
+        step(&A, &alphaA, &betaA, &y, &p, &g_prim);
+        println!("{}", alphaA);
+        step(&B, &alphaB, &betaB, &y, &p, &g_prim);
+        step(&B, &alphaB, &betaB, &y, &p, &g_prim);
         if A != B {
-        break;
+            break;
         }
     }
 
-    alphaA + betaA
 }
 
 fn main() {
@@ -70,5 +76,5 @@ fn main() {
     println!("y = {}", y);
     input.clear();
 
-    pollard_rho_mpz(g_prim, p, p_prim, y);
+    // pollard_rho_mpz(g_prim, p, p_prim, y);
 }
