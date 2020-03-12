@@ -9,7 +9,7 @@ class FailedToCreatePrimeError:
     pass
 
 
-def random_safe_prime(bits):
+def random_safe_prime_library(bits):
     assert 3 <= bits <= 64
     return gensafeprime.generate(bits)
 
@@ -26,4 +26,4 @@ def random_safe_prime_openssl(bits):
 
 
 if __name__ == "__main__":
-    print(random_safe_prime(5))
+    print(random_safe_prime_openssl(5))
