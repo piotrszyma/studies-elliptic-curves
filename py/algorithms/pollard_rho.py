@@ -14,6 +14,9 @@ class PollardRhoDLParams:
     p_prim: int
     y: int
 
+    def __str__(self):
+        return f"g_prim: {self.g_prim}, p: {self.p}, p_prim: {self.p_prim}, y: {self.y}"
+
 
 @dataclasses.dataclass
 class Point:
@@ -22,7 +25,8 @@ class Point:
 
 
 def generate_params(bits: int = 40) -> PollardRhoDLParams:
-    p = primegen.random_safe_prime(bits)
+    p = primegen.random_safe_prime_openssl(bits)
+
     p_prim = (p - 1) // 2
 
     g = random.randint(2, p - 1)
@@ -30,7 +34,6 @@ def generate_params(bits: int = 40) -> PollardRhoDLParams:
 
     rn = random.randint(2, p - 1)
     y = pow(rn, 2, p)  # To make QR.
-
     return PollardRhoDLParams(g_prim=g_prim, p=p, p_prim=p_prim, y=y,)
 
 

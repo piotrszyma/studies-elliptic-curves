@@ -1,3 +1,4 @@
+import gensafeprime
 import subprocess
 import re
 
@@ -10,6 +11,11 @@ class FailedToCreatePrimeError:
 
 def random_safe_prime(bits):
     assert 3 <= bits <= 64
+    return gensafeprime.generate(bits)
+
+
+def random_safe_prime_openssl(bits):
+    assert 3 <= bits <= 64
     command = f"openssl dhparam -text {bits}"
     result = subprocess.run(command.split(" "), capture_output=True)
 
@@ -20,4 +26,4 @@ def random_safe_prime(bits):
 
 
 if __name__ == "__main__":
-    print(random_safe_prime())
+    print(random_safe_prime(5))
