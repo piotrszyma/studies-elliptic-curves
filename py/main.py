@@ -35,7 +35,9 @@ def main():
             g_prim=int(input()), p=int(input()), p_prim=int(input()), y=int(input()),
         )
     else:
-        gen_function = random_safe_prime_openssl if args.openssl else random_safe_prime_library
+        gen_function = (
+            random_safe_prime_openssl if args.openssl else random_safe_prime_library
+        )
         params = pollard_rho.generate_params(args.nbits, gen_function)
 
     if args.genparams:

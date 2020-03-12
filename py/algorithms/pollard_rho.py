@@ -24,7 +24,9 @@ class Point:
     beta: int = 0
 
 
-def generate_params(bits: int = 40, primes_generating_function=primegen.random_safe_prime_openssl) -> PollardRhoDLParams:
+def generate_params(
+    bits: int = 40, primes_generating_function=primegen.random_safe_prime_openssl
+) -> PollardRhoDLParams:
     p = primes_generating_function(bits)
 
     p_prim = (p - 1) // 2
