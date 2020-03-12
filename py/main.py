@@ -17,12 +17,14 @@ Useful for test cases generation.
 """
 import argparse
 
+from utils.primegen import random_safe_prime_openssl, random_safe_prime_library
 from algorithms import pollard_rho
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--genparams", "-g", action="store_true", default=False)
 parser.add_argument("--nbits", "-n", type=int, default=40)
 parser.add_argument("--fromstdin", "-in", action="store_true", default=False)
+parser.add_argument("--openssl", "-o", action="store_true", default=False)
 
 
 def main():
@@ -33,7 +35,8 @@ def main():
             g_prim=int(input()), p=int(input()), p_prim=int(input()), y=int(input()),
         )
     else:
-        params = pollard_rho.generate_params(args.nbits)
+        gen_function = random_safe_prime_openssl if args.openssl else random_safe_prime_library
+        params = pollard_rho.generate_params(args.nbits, gen_function)
 
     if args.genparams:
         print(params.g_prim)
