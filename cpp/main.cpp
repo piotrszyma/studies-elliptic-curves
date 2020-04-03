@@ -1,4 +1,4 @@
-/**Pollard rho implemented in cpp
+/** Pollard rho implemented in cpp
 
 Requires four params passed to stdin, line by line:
 
@@ -10,7 +10,7 @@ Requires four params passed to stdin, line by line:
 passed as integers.
 
 To pass params created from python script, run:
-python3 ../../py/main.py --genparams --nbits 40 40 | ./pollard_rho
+python3 ../py/main.py --genparams --nbits 40 | ./pollard_rho.bin
 
 */
 

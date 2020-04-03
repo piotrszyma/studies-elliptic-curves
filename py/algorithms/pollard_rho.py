@@ -34,7 +34,7 @@ def generate_params(prime: int) -> PollardRhoDLParams:
 
     rn = random.randint(2, p - 1)
     y = pow(rn, 2, p)  # To make QR.
-    return PollardRhoDLParams(g_prim=g_prim, p=p, p_prim=p_prim, y=y,)
+    return PollardRhoDLParams(g_prim=g_prim, p=p, p_prim=p_prim, y=y)
 
 
 def _in_s1(e: int):
@@ -82,9 +82,11 @@ class PollardRhoDL:
             if A == B:
                 break
 
+        # x === ((alpha_2i - alpha_i) * ((beta_i - beta_2i) ^ (-1))) mod p_prim
         b_invs = pow(poeA.beta - poeB.beta, self.params.p_prim - 2, self.params.p_prim)
         a_deltas = poeB.alpha - poeA.alpha
 
+        # Return found x being DL such that g_prim ^ x = y mod p.
         return a_deltas * b_invs % self.params.p_prim
 
     def run(self):
