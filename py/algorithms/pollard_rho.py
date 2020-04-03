@@ -57,13 +57,17 @@ class PollardRhoDL:
         value, poe = values
         if _in_s1(value):
             poe.beta += 1
+            poe.beta %= self.params.p_prim
             return (value * self.params.y) % self.params.p, poe
         elif _in_s2(value):
             poe.alpha *= 2
+            poe.alpha %= self.params.p_prim
             poe.beta *= 2
+            poe.beta %= self.params.p_prim
             return (value * value) % self.params.p, poe
         elif _in_s3(value):
             poe.alpha += 1
+            poe.alpha %= self.params.p_prim
             return (self.params.g_prim * value) % self.params.p, poe
         else:
             raise RuntimeError("Impossibru.")

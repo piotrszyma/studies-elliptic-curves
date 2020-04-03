@@ -4,23 +4,27 @@
 namespace PollardRho
 {
 
-inline void f(mpz_class *num, mpz_class *alpha, mpz_class *beta, mpz_class *y, mpz_class *p, mpz_class *g_prim)
+inline void f(mpz_class *num, mpz_class *alpha, mpz_class *beta, mpz_class *y, mpz_class *p, mpz_class *p_prim, mpz_class *g_prim)
 {
   switch (mpz_class res = *num % 3; res.get_ui())
   {
   case 1:
     *beta += 1;
+    *beta %= *p_prim;
     *num *= *y;
     *num %= *p;
     break;
   case 0:
     *alpha *= 2;
+    *alpha %= *p_prim;
     *beta *= 2;
+    *beta %= *p_prim;
     *num *= *num;
     *num %= *p;
     break;
   case 2:
     *alpha += 1;
+    *alpha %= *p_prim;
     *num *= *g_prim;
     *num %= *p;
     break;
@@ -35,9 +39,9 @@ mpz_class pollard_rho_mpz(mpz_class *g_prim, mpz_class *p, mpz_class *p_prim, mp
 
   do
   {
-    f(&A, &alphaA, &betaA, y, p, g_prim);
-    f(&B, &alphaB, &betaB, y, p, g_prim);
-    f(&B, &alphaB, &betaB, y, p, g_prim);
+    f(&A, &alphaA, &betaA, y, p, p_prim, g_prim);
+    f(&B, &alphaB, &betaB, y, p, p_prim, g_prim);
+    f(&B, &alphaB, &betaB, y, p, p_prim, g_prim);
   } while (A != B);
 
   mpz_class betasInv;
