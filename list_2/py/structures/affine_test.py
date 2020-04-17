@@ -18,6 +18,7 @@ class AffinePointTestCase(unittest.TestCase):
             )
         )
 
+
 class TestAffinePointMultiplicationByScalar(AffinePointTestCase):
     def test_point_at_infinitity_times_scalar_should_be_infinity(self):
         # Arrange.
