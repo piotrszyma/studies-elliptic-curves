@@ -6,9 +6,11 @@ from typing import Tuple
 from utils import primegen
 from utils import timer
 
+from structures import affine
+
 
 @dataclasses.dataclass
-class PollardRhoDLParams:
+class EcAffinePollardRhoDLParams:
     g_prim: int
     p: int
     p_prim: int
@@ -24,7 +26,7 @@ class Point:
     beta: int = 0
 
 
-def generate_params(prime: int) -> PollardRhoDLParams:
+def generate_params(prime: int) -> EcAffinePollardRhoDLParams:
     p = prime
 
     p_prim = (p - 1) // 2
@@ -34,7 +36,7 @@ def generate_params(prime: int) -> PollardRhoDLParams:
 
     rn = random.randint(2, p - 1)
     y = pow(rn, 2, p)  # To make QR.
-    return PollardRhoDLParams(g_prim=g_prim, p=p, p_prim=p_prim, y=y)
+    return EcAffinePollardRhoDLParams(g_prim=g_prim, p=p, p_prim=p_prim, y=y)
 
 
 def _in_s1(e: int):
@@ -49,8 +51,8 @@ def _in_s3(e: int):
     return e % 3 == 2
 
 
-class PollardRhoDL:
-    def __init__(self, params: PollardRhoDLParams):
+class EcAffinePollardRhoDL:
+    def __init__(self, params: EcAffinePollardRhoDLParams):
         self.params = params
 
     def _f(self, values: Tuple[int, Point]) -> Tuple[int, Point]:
@@ -101,7 +103,7 @@ def main():
     params = generate_params()
     print(f"Running for {params}")
 
-    instance = PollardRhoDL(params)
+    instance = EcAffinePollardRhoDL(params)
 
     with timer.timeit("PollardRhoDL algorithm"):
         x_found = instance.run()
