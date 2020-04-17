@@ -18,24 +18,17 @@ class CurveParams:
     field_order: int
 
 
-_CURVE_PARAM_ORDER = 807369655039
-_CURVE_PARAM_FIELD_ORDER = 807368793739
-_CURVE_PARAM_A = 236367012452
-_CURVE_PARAM_B = 74315650609
-_CURVE_PARAM_BASE_POINT = CurveBasePoint(172235452673, 488838007757)
+default_curve_params = CurveParams(
+    curve_order=807369655039,
+    field_order=807368793739,
+    a=236367012452,
+    b=74315650609,
+    base_point=CurveBasePoint(x=172235452673, y=488838007757),
+)
 
 
 def set_curve_params(curve_params: CurveParams):
-    global _CURVE_PARAM_BASE_POINT
-    global _CURVE_PARAM_ORDER
-    global _CURVE_PARAM_FIELD_ORDER
-    global _CURVE_PARAM_A
-    global _CURVE_PARAM_B
-    _CURVE_PARAM_BASE_POINT = curve_params.base_point
-    _CURVE_PARAM_ORDER = curve_params.curve_order
-    _CURVE_PARAM_FIELD_ORDER = curve_params.field_order
-    _CURVE_PARAM_A = curve_params.a
-    _CURVE_PARAM_B = curve_params.b
+    AffinePoint._curve_params = curve_params
 
 
 def modinv(a, n):
@@ -52,6 +45,7 @@ def modinv(a, n):
 class AffinePoint:
     _inf = None
     _base_point = None
+    _curve_params = default_curve_params
     __slots__ = ("x", "y")
 
     def __init__(
@@ -60,8 +54,8 @@ class AffinePoint:
         y: Optional[int] = None,
         inf: Optional[bool] = False,
     ):
-        self.x = x % _CURVE_PARAM_FIELD_ORDER if x else x
-        self.y = y % _CURVE_PARAM_FIELD_ORDER if y else y
+        self.x = x % self._curve_params.field_order if x else x
+        self.y = y % self._curve_params.field_order if y else y
 
     def __repr__(self):
         if self.is_infinity():
@@ -81,7 +75,7 @@ class AffinePoint:
         if not isinstance(value, int):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
 
-        value = value % _CURVE_PARAM_ORDER
+        value = value % self._curve_params.curve_order
 
         if value == 2:
             if self.is_infinity():
@@ -91,9 +85,10 @@ class AffinePoint:
                 return self.get_infinity()
 
             s = (
-                pow(self.x, 2, _CURVE_PARAM_FIELD_ORDER) * 3 + _CURVE_PARAM_A
-            ) * modinv(2 * self.y, _CURVE_PARAM_FIELD_ORDER)
-            x2 = pow(s, 2, _CURVE_PARAM_FIELD_ORDER) - 2 * self.x
+                pow(self.x, 2, self._curve_params.field_order) * 3
+                + self._curve_params.a
+            ) * modinv(2 * self.y, self._curve_params.field_order)
+            x2 = pow(s, 2, self._curve_params.field_order) - 2 * self.x
             y2 = (s * (self.x - x2)) - self.y
 
             return AffinePoint(x=x2, y=y2)
@@ -127,7 +122,9 @@ class AffinePoint:
                 return self * 2
             return AffinePoint.get_infinity()
 
-        s = (self.y - other.y) * modinv(self.x - other.x, _CURVE_PARAM_FIELD_ORDER)
+        s = (self.y - other.y) * modinv(
+            self.x - other.x, self._curve_params.field_order
+        )
 
         x_ = s ** 2 - self.x - other.x
         y_ = s * (self.x - x_) - self.y
@@ -142,7 +139,7 @@ class AffinePoint:
 
     @classmethod
     def random(cls):
-        return cls.get_base_point() * random.randint(2, _CURVE_PARAM_ORDER)
+        return cls.get_base_point() * random.randint(2, cls._curve_params.curve_order)
 
     @classmethod
     def get_infinity(cls):
@@ -155,5 +152,5 @@ class AffinePoint:
     def get_base_point(cls):
         if cls._base_point:
             return cls._base_point
-        cls._base_point = cls(*_CURVE_PARAM_BASE_POINT)
+        cls._base_point = cls(*cls._curve_params.base_point)
         return cls._base_point
