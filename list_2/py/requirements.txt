@@ -1,2 +1,4 @@
 pdbpp
 gensafeprime
+pytest
+coverage
