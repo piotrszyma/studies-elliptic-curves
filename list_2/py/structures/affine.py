@@ -39,7 +39,7 @@ def modinv(a, n):
     # at this point a is the gcd of the original inputs
     if a == 1:
         return b
-    raise ValueError("Not invertible")
+    raise ValueError(f"{a} is not invertible modulo {n}")
 
 
 class AffinePoint:
