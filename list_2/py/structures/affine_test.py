@@ -1,4 +1,3 @@
-import copy
 import unittest
 
 from affine import AffinePoint, set_curve_params, CurveBasePoint, CurveParams
