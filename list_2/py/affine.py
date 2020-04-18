@@ -64,7 +64,7 @@ class AffinePoint:
 
     def __eq__(self, other: "AffinePoint") -> bool:
         if not isinstance(other, AffinePoint):
-            return False
+            return NotImplemented
 
         if self.is_infinity() and other.is_infinity():
             return True
@@ -133,6 +133,11 @@ class AffinePoint:
 
     def __radd__(self, other):
         return self.__add__(other)
+
+    def __neg__(self):
+        if self.is_infinity():
+            return self
+        return AffinePoint(x=self.x, y=-self.y)
 
     def is_infinity(self):
         return self.x is None and self.y is None
