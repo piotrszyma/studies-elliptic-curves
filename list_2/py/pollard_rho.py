@@ -113,9 +113,15 @@ class EcAffinePollardRhoDL:
 
 
 def main():
-    params = generate_params()
-    print(f"Running for {params}")
-
+    curve_params = affine.CurveParams(
+        base_point=affine.CurveBasePoint(172235452673, 488838007757),
+        a=236367012452,
+        b=74315650609,
+        field_order=807368793739,
+        curve_order=807369655039,
+    )
+    params = generate_params(curve_params)
+    print(f"Running for {curve_params}")
     instance = EcAffinePollardRhoDL(params)
 
     with timer.timeit("PollardRhoDL algorithm"):
