@@ -75,7 +75,6 @@ class AffinePoint:
         if not isinstance(value, int):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
 
-        # TODO: discuss it, as it was changed from curve_order
         value = value % self._curve_params.field_order
 
         if value == 2:  # TODO: migrate to Fields

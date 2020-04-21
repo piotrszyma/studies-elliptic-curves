@@ -6,7 +6,7 @@ import dataclasses
 
 from typing import Optional
 
-CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y")
+CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y z")
 
 
 @dataclasses.dataclass
@@ -23,7 +23,7 @@ default_curve_params = CurveParams(
     field_order=807368793739,
     a=236367012452,
     b=74315650609,
-    base_point=CurveBasePoint(x=172235452673, y=488838007757),
+    base_point=CurveBasePoint(x=172235452673, y=488838007757, z=1),
 )
 
 
@@ -83,7 +83,6 @@ class ProjectivePoint:
         value = value % self._curve_params.field_order
         two = 2 % self._curve_params.field_order
         three = 3 % self._curve_params.field_order
-
         if value == 2:
             if self.is_infinity() or self.y == 0:
                 return self.get_infinity()
@@ -150,7 +149,7 @@ class ProjectivePoint:
     def __neg__(self):
         if self.is_infinity():
             return self
-        return ProjectivePoint(x=self.x, y=-self.y)
+        return ProjectivePoint(x=self.x, y=-self.y, z=self.z)
 
     def is_infinity(self):
         return self.x is None and self.y is None
