@@ -1,9 +1,10 @@
+from affine import AffinePoint
+
 import collections
 import random
 import copy
 import math
 import dataclasses
-
 from typing import Optional
 
 CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y z")
@@ -58,6 +59,13 @@ class ProjectivePoint:
         self.x = x % self._curve_params.field_order if x else x
         self.y = y % self._curve_params.field_order if y else y
         self.z = z % self._curve_params.field_order if z else z
+
+    def convert_to_affine_point(self):
+        if self.is_infinity():
+            return AffinePoint.get_infinity()
+        else:
+            div = modinv(self.z, self._curve_params.field_order)
+            return AffinePoint(self.x * div, self.y * div)
 
     def __repr__(self):
         if self.is_infinity():
