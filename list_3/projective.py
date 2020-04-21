@@ -77,13 +77,72 @@ class ProjectivePoint:
         return not (self == other)
 
     def __mul__(self, value: int) -> "ProjectivePoint":
-        raise NotImplementedError
+        if not isinstance(value, int):
+            raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
+
+        value = value % self._curve_params.field_order
+        two = 2 % self._curve_params.field_order
+        three = 3 % self._curve_params.field_order
+
+        if value == 2:
+            if self.is_infinity() or self.y == 0:
+                return self.get_infinity()
+
+            t = self.x * self.x * three + self._curve_params.a * self.z * self.z
+            u = self.y * self.z * two
+            v = u * self.x * self.y * two
+            w = t * t - v * two
+            x2 = u * w
+            y2 = t * (v - w) - u * u * self.y * self.y * two
+            z2 = u * u * u
+
+            return ProjectivePoint(x=x2, y=y2, z=z2)
+
+        temp = copy.deepcopy(self)
+        result = ProjectivePoint.get_infinity()
+
+        while value != 0:
+            if value & 1 != 0:
+                result += temp
+            temp *= 2
+            value >>= 1
+
+        return result
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __add__(self, other: "ProjectivePoint") -> "ProjectivePoint":
-        raise NotImplementedError
+        if not isinstance(other, ProjectivePoint):
+            raise NotImplementedError(f"Cannot multiply {type(self)} and {type(other)}")
+
+        if self.is_infinity():
+            return other
+
+        if other.is_infinity():
+            return self
+
+        t0 = self.y * other.z
+        t1 = other.y * self.z
+        u0 = self.x * other.z
+        u1 = other.x * self.z
+
+        if u0 == u1:
+            if t0 == t1:
+                return self * 2
+            else:
+                return ProjectivePoint.get_infinity()
+        else:
+            t = t0 - t1
+            u = u0 - u1
+            u2 = u * u
+            v = self.z * other.z
+            w = t * t * v - u2 * (u0 + u1)
+            u3 = u * u2
+            x_ = u * w
+            y_ = t * (u0 * u2 - w) - t0 * u3
+            z_ = u3 * v
+        return ProjectivePoint(x=x_, y=y_, z=z_)
 
     def __radd__(self, other):
         return self.__add__(other)

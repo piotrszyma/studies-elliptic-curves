@@ -75,13 +75,11 @@ class AffinePoint:
         if not isinstance(value, int):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
 
-        value = value % self._curve_params.curve_order
+        # TODO: discuss it, as it was changed from curve_order
+        value = value % self._curve_params.field_order
 
-        if value == 2: # TODO: migrate to Fields
-            if self.is_infinity():
-                return self.get_infinity()
-
-            if self.y == 0:
+        if value == 2:  # TODO: migrate to Fields
+            if self.is_infinity() or self.y == 0:
                 return self.get_infinity()
 
             s = (
