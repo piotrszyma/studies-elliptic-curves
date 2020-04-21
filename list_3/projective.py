@@ -28,7 +28,7 @@ default_curve_params = CurveParams(
 
 
 def set_curve_params(curve_params: CurveParams):
-    AffinePoint._curve_params = curve_params
+    ProjectivePoint._curve_params = curve_params
 
 
 def modinv(a, n):
@@ -42,94 +42,48 @@ def modinv(a, n):
     raise ValueError(f"{a} is not invertible modulo {n}")
 
 
-class AffinePoint:
+class ProjectivePoint:
     _inf = None
     _base_point = None
     _curve_params = default_curve_params
-    __slots__ = ("x", "y")
+    __slots__ = ("x", "y", "z")
 
     def __init__(
         self,
         x: Optional[int] = None,
         y: Optional[int] = None,
+        z: Optional[int] = None,
         inf: Optional[bool] = False,
     ):
         self.x = x % self._curve_params.field_order if x else x
         self.y = y % self._curve_params.field_order if y else y
+        self.z = z % self._curve_params.field_order if z else z
 
     def __repr__(self):
         if self.is_infinity():
-            return "AffinePoint(at infinity)"
-        return f"AffinePoint({self.x}, {self.y})"
+            return "ProjectivePoint(at infinity)"
+        return f"ProjectivePoint({self.x}, {self.y}, {self.z})"
 
-    def __eq__(self, other: "AffinePoint") -> bool:
-        if not isinstance(other, AffinePoint):
+    def __eq__(self, other: "ProjectivePoint") -> bool:
+        if not isinstance(other, ProjectivePoint):
             return NotImplemented
 
         if self.is_infinity() and other.is_infinity():
             return True
 
-        return self.x == other.x and self.y == other.y
+        return self.x * other.z == other.x * self.z and self.y * other.z == other.y * self.z
 
-    def __mul__(self, value: int) -> "AffinePoint":
-        if not isinstance(value, int):
-            raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
+    def __ne__(self, other: "ProjectivePoint") -> bool:
+        return not (self == other)
 
-        value = value % self._curve_params.curve_order
-
-        if value == 2: # TODO: migrate to Fields
-            if self.is_infinity():
-                return self.get_infinity()
-
-            if self.y == 0:
-                return self.get_infinity()
-
-            s = (
-                pow(self.x, 2, self._curve_params.field_order) * 3
-                + self._curve_params.a
-            ) * modinv(2 * self.y, self._curve_params.field_order)
-            x2 = pow(s, 2, self._curve_params.field_order) - 2 * self.x
-            y2 = (s * (self.x - x2)) - self.y
-
-            return AffinePoint(x=x2, y=y2)
-
-        temp = copy.deepcopy(self)
-        result = AffinePoint.get_infinity()
-
-        while value != 0:
-            if value & 1 != 0:
-                result += temp
-            temp *= 2
-            value >>= 1
-
-        return result
+    def __mul__(self, value: int) -> "ProjectivePoint":
+        raise NotImplementedError
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
-    def __add__(self, other: "AffinePoint") -> "AffinePoint":
-        if not isinstance(other, AffinePoint):
-            raise NotImplementedError(f"Cannot multiply {type(self)} and {type(other)}")
-
-        if self.is_infinity():
-            return other
-
-        if other.is_infinity():
-            return self
-
-        if self.x == other.x:
-            if self.y == other.y:
-                return self * 2
-            return AffinePoint.get_infinity()
-
-        s = (self.y - other.y) * modinv(
-            self.x - other.x, self._curve_params.field_order
-        )
-
-        x_ = s ** 2 - self.x - other.x
-        y_ = s * (self.x - x_) - self.y
-
-        return AffinePoint(x=x_, y=y_)
+    def __add__(self, other: "ProjectivePoint") -> "ProjectivePoint":
+        raise NotImplementedError
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -137,7 +91,7 @@ class AffinePoint:
     def __neg__(self):
         if self.is_infinity():
             return self
-        return AffinePoint(x=self.x, y=-self.y)
+        return ProjectivePoint(x=self.x, y=-self.y)
 
     def is_infinity(self):
         return self.x is None and self.y is None
