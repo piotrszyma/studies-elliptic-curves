@@ -28,6 +28,17 @@ class Coeffs:
     beta: int = 0
 
 
+def modinv(a, n):
+    b, c = 1, 0
+    while n:
+        q, r = divmod(a, n)
+        a, b, c, n = n, c, b - q * c, r
+    # at this point a is the gcd of the original inputs
+    if a == 1:
+        return b
+    raise ValueError(f"{a} is not invertible modulo {n}")
+
+
 def generate_params(curve_params: projective.CurveParams) -> EcProjectivePollardRhoDLParams:
     base_point = projective.ProjectivePoint(
         curve_params.base_point.x,
@@ -106,12 +117,14 @@ class EcProjectivePollardRhoDL:
             slow_coeffs.alpha * self.base_point + slow_coeffs.beta * self.mul_point ==
             fast_coeffs.alpha * self.base_point + fast_coeffs.beta * self.mul_point
         )
-        found_mul = (
-            (slow_coeffs.alpha - fast_coeffs.alpha) //
-            (fast_coeffs.beta - slow_coeffs.beta)
-        )
-        # Return found_mul being ECDL such that base_pount * found_mul = mul_point
-        return found_mul
+
+        alphas_diff = slow_coeffs.alpha - fast_coeffs.alpha
+        betas_diff = fast_coeffs.beta - slow_coeffs.beta
+        betas_inv = modinv(betas_diff, self.curve_order)
+
+        result = (alphas_diff * betas_inv) % self.curve_order
+
+        return result
 
     def run(self):
         return self._walk()

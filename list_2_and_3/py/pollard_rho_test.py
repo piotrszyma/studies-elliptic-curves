@@ -56,8 +56,9 @@ class TestRhoPollard(unittest.TestCase):
         instance = projective_rho.EcProjectivePollardRhoDL(params)
 
         # Act.
-        result = abs(instance.run())
+        result = instance.run()
 
+        import pdb; pdb.set_trace()
         assert result * params.base_point == params.mul_point
 
         # Assert.
