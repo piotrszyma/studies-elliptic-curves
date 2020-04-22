@@ -1,2 +1,3 @@
-echo $1
-docker run -v $(pwd):/home/sage/shared sagemath/sagemath:latest sage /home/sage/shared/ec-prime-order.sage $1
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+docker run -v $DIR:/home/sage/shared sagemath/sagemath:latest sage /home/sage/shared/ec-prime-order.sage $1 | tail -n  1
