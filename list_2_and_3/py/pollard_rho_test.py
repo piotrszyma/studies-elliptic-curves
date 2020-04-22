@@ -34,7 +34,7 @@ class TestRhoPollard(unittest.TestCase):
         self.assertEqual(2, result)
 
 
-    @mock.patch.object(random, "randint", new=lambda *args: 2)
+    @mock.patch.object(random, "randint", new=lambda *args: 7)
     def test_run_projective(self):
         # Arrange.
         # curve_params = projective.CurveParams(
@@ -56,10 +56,12 @@ class TestRhoPollard(unittest.TestCase):
         instance = projective_rho.EcProjectivePollardRhoDL(params)
 
         # Act.
-        result = instance.run()
+        result = abs(instance.run())
+
+        assert result * params.base_point == params.mul_point
 
         # Assert.
-        self.assertEqual(2, result)
+        self.assertEqual(7, result)
 
 
 

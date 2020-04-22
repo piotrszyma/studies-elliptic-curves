@@ -67,16 +67,19 @@ class EcProjectivePollardRhoDL:
     def _f(self, values: Tuple[projective.ProjectivePoint, Coeffs]) -> Tuple[int, Coeffs]:
         value, coeffs = values
         if _in_s1(value):
+            # assert coeffs.alpha * self.base_point + coeffs.beta * self.mul_point == value
             coeffs.alpha += 1
             coeffs.alpha %= self.curve_order
             return value + self.base_point, coeffs
         elif _in_s2(value):
+            # assert coeffs.alpha * self.base_point + coeffs.beta * self.mul_point == value
             coeffs.alpha *= 2
             coeffs.alpha %= self.curve_order
             coeffs.beta *= 2
             coeffs.beta %= self.curve_order
             return value * 2, coeffs
         elif _in_s3(value):
+            # assert coeffs.alpha * self.base_point + coeffs.beta * self.mul_point == value
             coeffs.beta += 1
             coeffs.beta %= self.curve_order
             return value + self.mul_point, coeffs

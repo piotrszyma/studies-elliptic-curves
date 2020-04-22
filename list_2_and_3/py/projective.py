@@ -73,8 +73,6 @@ class ProjectivePoint:
         else: 
             self.z = z
         
-        print('dupa')
-        
         # self.x = FieldInt(x, modulus) if x is not None else x
         # self.y = FieldInt(y, modulus) if y is not None else y
         # self.z = FieldInt(z, modulus) if z is not None else z
@@ -106,10 +104,14 @@ class ProjectivePoint:
         return not (self == other)
 
     def __mul__(self, value: FieldInt) -> "ProjectivePoint":
+        modulus = self._curve_params.field_order
+        
+        if isinstance(value, int):
+            value = FieldInt(value, modulus)
+
         if not isinstance(value, FieldInt):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
-
-        modulus = self._curve_params.field_order
+        
         two = FieldInt(2, modulus)
         three = FieldInt(3, modulus)
         a = FieldInt(self._curve_params.a, modulus)
