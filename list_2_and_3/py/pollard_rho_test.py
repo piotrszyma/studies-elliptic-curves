@@ -15,17 +15,22 @@ class TestRhoPollard(unittest.TestCase):
     def test_run_affine(self):
         # Arrange.
         curve_params = affine.CurveParams(
-            base_point=affine.CurveBasePoint(172235452673, 488838007757),
-            a=236367012452,
-            b=74315650609,
-            field_order=807368793739,
-            curve_order=807369655039,
+            base_point=affine.CurveBasePoint(2928, 42354),
+            a=40798,
+            b=14047,
+            field_order=62071,
+            curve_order=62039,
         )
+        # curve_params = affine.CurveParams(
+        #     base_point=affine.CurveBasePoint(172235452673, 488838007757),
+        #     a=236367012452,
+        #     b=74315650609,
+        #     field_order=807368793739,
+        #     curve_order=807369655039,
+        # )
         affine.set_curve_params(curve_params)
         params = affine_rho.generate_params(curve_params)
         instance = affine_rho.EcAffinePollardRhoDL(params)
-        # import pdb
-        # pdb.set_trace()
 
         # Act.
         result = instance.run()
@@ -57,9 +62,6 @@ class TestRhoPollard(unittest.TestCase):
 
         # Act.
         result = instance.run()
-
-        import pdb; pdb.set_trace()
-        assert result * params.base_point == params.mul_point
 
         # Assert.
         self.assertEqual(7, result)

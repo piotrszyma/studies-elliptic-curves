@@ -1,6 +1,3 @@
-import pdb
-
-
 class FieldInt:
 
     # -- Instance management methods --

@@ -50,7 +50,7 @@ class TestProjectivePointMultiplicationByScalar(ProjectivePointTestCase):
 
         # Act.
         result = point_with_y_zero * FieldInt(2, modulus)
-        
+
         # Assert.
         self.assertTrue(result.is_infinity())
 
@@ -101,11 +101,11 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
         modulo = point._curve_params.field_order
 
         # Act.
-        point_mul_0 =  FieldInt(2, modulo) * point
+        point_mul_0 = FieldInt(2, modulo) * point
         point_mul_1 = point * FieldInt(2137, modulo)
         point_mul_2 = FieldInt(741274052018, modulo) * point
         point_mul_3 = point * FieldInt(649074375334, modulo)
-        
+
         # Assert.
         self.assertEqual(
             AffinePoint(215387987039, 765000578277),
@@ -157,19 +157,6 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
 
         self.assertEqual(two_mul_point, AffinePoint(215387987039, 765000578277))
         self.assertEqual(two_mul_point, point_add_point)
-
-    # def test_uga_buga(self):
-    #     value = ProjectivePoint(388012790166, 14292500247, 467443641221)
-    #     alpha = 2
-    #     beta = 2
-    #     base_point = ProjectivePoint(172235452673, 488838007757, 1)
-    #     mul_point = ProjectivePoint(142354355405, 341203862054, 718281879040)
-    #     modulo = value._curve_params.field_order
-    #     left = alpha * base_point
-    #     right = beta * mul_point
-    #     value_new = left + right
-    #     import pdb; pdb.set_trace()
-    #     assert value == value_new
 
 
 if __name__ == "__main__":
