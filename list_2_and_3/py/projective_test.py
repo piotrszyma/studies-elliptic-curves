@@ -1,21 +1,38 @@
 import unittest
 from field import FieldInt
 
+import projective
+import affine
 from affine import AffinePoint
-from projective import ProjectivePoint, set_curve_params, CurveBasePoint, CurveParams
+from projective import ProjectivePoint
 
 
 class ProjectivePointTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        set_curve_params(
-            CurveParams(
-                base_point=CurveBasePoint(172235452673, 488838007757, 1),
-                a=236367012452,
-                b=74315650609,
-                field_order=807368793739,
-                curve_order=807369655039,
+        base_point = [172235452673, 488838007757, 1]
+        a = 236367012452
+        b = 74315650609
+        field_order = 807368793739
+        curve_order = 807369655039
+    
+        projective.set_curve_params(
+            projective.CurveParams(
+                base_point=projective.CurveBasePoint(*base_point),
+                a=a,
+                b=b,
+                field_order=field_order,
+                curve_order=curve_order,
+            )
+        )
+        affine.set_curve_params(
+            affine.CurveParams(
+                base_point=affine.CurveBasePoint(*base_point[:2]),
+                a=a,
+                b=b,
+                field_order=field_order,
+                curve_order=curve_order,
             )
         )
 
@@ -154,6 +171,7 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
         # Assert.
         two_mul_point = two_mul_point.convert_to_affine_point()
         point_add_point = point_add_point.convert_to_affine_point()
+        print(two_mul_point, point_add_point)
 
         self.assertEqual(two_mul_point, AffinePoint(215387987039, 765000578277))
         self.assertEqual(two_mul_point, point_add_point)
