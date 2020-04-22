@@ -58,9 +58,6 @@ class ProjectivePoint:
         z: Optional[int] = None,
         inf: Optional[bool] = False,
     ):
-        # self.x = x % self._curve_params.field_order if x is not None else x
-        # self.y = y % self._curve_params.field_order if y is not None else y
-        # self.z = z % self._curve_params.field_order if z is not None else z
         modulus = self._curve_params.field_order
         if not isinstance(x, FieldInt): # da sie uproscic
             self.x = FieldInt(x, modulus) if x is not None else x
@@ -87,8 +84,11 @@ class ProjectivePoint:
         if self.is_infinity():
             return AffinePoint.get_infinity()
         else:
-            div = modinv(self.z, self._curve_params.field_order)
-            return AffinePoint(self.x * div, self.y * div)
+            # div = modinv(self.z, self._curve_params.field_order)
+            div = self.z.reciprocal()
+            x = (self.x * div).value % self._curve_params.field_order
+            y = (self.y * div).value % self._curve_params.field_order
+            return AffinePoint(x, y)
 
     def __repr__(self):
         if self.is_infinity():
