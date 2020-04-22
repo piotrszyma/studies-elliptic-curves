@@ -6,6 +6,8 @@ import copy
 import math
 import dataclasses
 from typing import Optional
+from field import FieldInt
+import pdb
 
 CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y z")
 
@@ -56,9 +58,13 @@ class ProjectivePoint:
         z: Optional[int] = None,
         inf: Optional[bool] = False,
     ):
-        self.x = x % self._curve_params.field_order if x else x
-        self.y = y % self._curve_params.field_order if y else y
-        self.z = z % self._curve_params.field_order if z else z
+        # self.x = x % self._curve_params.field_order if x is not None else x
+        # self.y = y % self._curve_params.field_order if y is not None else y
+        # self.z = z % self._curve_params.field_order if z is not None else z
+        modulus = self._curve_params.field_order
+        self.x = FieldInt(x, modulus) if x is not None else x
+        self.y = FieldInt(y, modulus) if y is not None else y
+        self.z = FieldInt(z, modulus) if z is not None else z
 
     def convert_to_affine_point(self):
         if self.is_infinity():
@@ -84,21 +90,24 @@ class ProjectivePoint:
     def __ne__(self, other: "ProjectivePoint") -> bool:
         return not (self == other)
 
-    def __mul__(self, value: int) -> "ProjectivePoint":
-        if not isinstance(value, int):
+    def __mul__(self, value: FieldInt) -> "ProjectivePoint":
+        if not isinstance(value, FieldInt):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
 
-        value = value % self._curve_params.field_order
-        two = 2 % self._curve_params.field_order
-        three = 3 % self._curve_params.field_order
-        if value == 2:
+        modulus = self._curve_params.field_order
+        two = FieldInt(2, modulus)
+        three = FieldInt(3, modulus)
+        pdb.set_trace()
+        a = FieldInt(self._curve_params.a, modulus)
+
+        if value == two:
             if self.is_infinity() or self.y == 0:
                 return self.get_infinity()
-
-            t = self.x * self.x * three + self._curve_params.a * self.z * self.z
+            t = self.x * self.x * three + a * self.z * self.z
             u = self.y * self.z * two
             v = u * self.x * self.y * two
             w = t * t - v * two
+
             x2 = u * w
             y2 = t * (v - w) - u * u * self.y * self.y * two
             z2 = u * u * u
@@ -111,7 +120,7 @@ class ProjectivePoint:
         while value != 0:
             if value & 1 != 0:
                 result += temp
-            temp *= 2
+            temp = temp * 2
             value >>= 1
 
         return result
@@ -121,13 +130,14 @@ class ProjectivePoint:
 
     def __add__(self, other: "ProjectivePoint") -> "ProjectivePoint":
         if not isinstance(other, ProjectivePoint):
-            raise NotImplementedError(f"Cannot multiply {type(self)} and {type(other)}")
-
+            raise NotImplementedError(f"Cannot add {type(self)} and {type(other)}")
         if self.is_infinity():
             return other
 
         if other.is_infinity():
             return self
+
+        modulo = self._curve_params.field_order
 
         t0 = self.y * other.z
         t1 = other.y * self.z
@@ -142,13 +152,14 @@ class ProjectivePoint:
         else:
             t = t0 - t1
             u = u0 - u1
-            u2 = u * u
+            u2 = pow(u, u, modulo)
             v = self.z * other.z
             w = t * t * v - u2 * (u0 + u1)
             u3 = u * u2
             x_ = u * w
             y_ = t * (u0 * u2 - w) - t0 * u3
             z_ = u3 * v
+            # print(f"t: {t}, u: {u}, u2: {u2}, v: {v}, w: {w}, u3: {u3}, x_: {x_}, y_:{y_}, z: {z_}")
         return ProjectivePoint(x=x_, y=y_, z=z_)
 
     def __radd__(self, other):
