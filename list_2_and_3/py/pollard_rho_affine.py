@@ -30,8 +30,7 @@ class Coeffs:
 
 def generate_params(curve_params: affine.CurveParams) -> EcAffinePollardRhoDLParams:
     base_point = affine.AffinePoint(
-        curve_params.base_point.x,
-        curve_params.base_point.y
+        curve_params.base_point.x, curve_params.base_point.y
     )
 
     k = random.randint(2, curve_params.curve_order)
@@ -55,6 +54,17 @@ def _in_s2(point: affine.AffinePoint):
 
 def _in_s3(point: affine.AffinePoint):
     return point.x % 3 == 2
+
+
+def modinv(a, n):
+    b, c = 1, 0
+    while n:
+        q, r = divmod(a, n)
+        a, b, c, n = n, c, b - q * c, r
+    # at this point a is the gcd of the original inputs
+    if a == 1:
+        return b
+    raise ValueError(f"{a} is not invertible modulo {n}")
 
 
 class EcAffinePollardRhoDL:
@@ -100,15 +110,21 @@ class EcAffinePollardRhoDL:
         assert math.gcd(fast_coeffs.beta - slow_coeffs.beta, self.field_order) == 1
 
         assert (
-            slow_coeffs.alpha * self.base_point + slow_coeffs.beta * self.mul_point ==
-            fast_coeffs.alpha * self.base_point + fast_coeffs.beta * self.mul_point
+            slow_coeffs.alpha * self.base_point + slow_coeffs.beta * self.mul_point
+            == fast_coeffs.alpha * self.base_point + fast_coeffs.beta * self.mul_point
         )
-        found_mul = (
-            (slow_coeffs.alpha - fast_coeffs.alpha) //
-            (fast_coeffs.beta - slow_coeffs.beta)
-        )
+
+        alphas_diff = slow_coeffs.alpha - fast_coeffs.alpha
+        betas_diff = fast_coeffs.beta - slow_coeffs.beta
+        betas_inv = modinv(betas_diff, self.curve_order)
+
+        result = (alphas_diff * betas_inv) % self.curve_order
+
+        # found_mul = (slow_coeffs.alpha - fast_coeffs.alpha) // (
+        #     fast_coeffs.beta - slow_coeffs.beta
+        # )
         # Return found_mul being ECDL such that base_pount * found_mul = mul_point
-        return found_mul
+        return result
 
     def run(self):
         return self._walk()
