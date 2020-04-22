@@ -49,9 +49,9 @@ class TestProjectivePointMultiplicationByScalar(ProjectivePointTestCase):
         point_with_y_zero = ProjectivePoint(2, 0, 1)
 
         # Act.
-        import pdb; pdb.set_trace()
         result = point_with_y_zero * FieldInt(2, modulus)
         
+        import pdb; pdb.set_trace()
 
         # Assert.
         self.assertTrue(result.is_infinity())

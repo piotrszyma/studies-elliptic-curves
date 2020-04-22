@@ -62,7 +62,6 @@ class ProjectivePoint:
         # self.y = y % self._curve_params.field_order if y is not None else y
         # self.z = z % self._curve_params.field_order if z is not None else z
         modulus = self._curve_params.field_order
-
         if not isinstance(x, FieldInt): # da sie uproscic
             self.x = FieldInt(x, modulus) if x is not None else x
         else: 
@@ -77,6 +76,8 @@ class ProjectivePoint:
             self.z = FieldInt(z, modulus) if z is not None else z
         else: 
             self.z = z
+        
+        print('dupa')
         
         # self.x = FieldInt(x, modulus) if x is not None else x
         # self.y = FieldInt(y, modulus) if y is not None else y
@@ -113,11 +114,12 @@ class ProjectivePoint:
         modulus = self._curve_params.field_order
         two = FieldInt(2, modulus)
         three = FieldInt(3, modulus)
-        pdb.set_trace()
         a = FieldInt(self._curve_params.a, modulus)
+        zero = FieldInt(0, modulus)
 
         if value == two:
-            if self.is_infinity() or self.y == 0:
+            if self.is_infinity() or self.y == zero:
+
                 return self.get_infinity()
             t = self.x * self.x * three + a * self.z * self.z
             u = self.y * self.z * two
@@ -127,7 +129,6 @@ class ProjectivePoint:
             x2 = u * w
             y2 = t * (v - w) - u * u * self.y * self.y * two
             z2 = u * u * u
-            pdb.set_trace()
             return ProjectivePoint(x=x2, y=y2, z=z2)
 
         temp = copy.deepcopy(self)
