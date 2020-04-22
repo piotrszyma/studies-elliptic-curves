@@ -5,14 +5,14 @@ class FieldInt:
 
 	# -- Instance management methods --
 	def __init__(self, value, modulus):
-			if not isinstance(value, int) or not isinstance(modulus, int):
-					raise TypeError("Expected integers")
-			if modulus <= 0:
-					raise ValueError("Modulus must be positive")
-			if not (0 <= value < modulus):
-					raise ValueError("Value out of range")
-			self.value = value
-			self.modulus = modulus
+		if not isinstance(value, int) or not isinstance(modulus, int):
+			raise TypeError("Expected integers")
+		if modulus <= 0:
+				raise ValueError("Modulus must be positive")
+		if not (0 <= value < modulus):
+				raise ValueError("Value out of range")
+		self.value = value
+		self.modulus = modulus
 
 	def _create(self, val):
 		return FieldInt(val % self.modulus, self.modulus)

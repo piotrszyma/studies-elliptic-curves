@@ -62,9 +62,25 @@ class ProjectivePoint:
         # self.y = y % self._curve_params.field_order if y is not None else y
         # self.z = z % self._curve_params.field_order if z is not None else z
         modulus = self._curve_params.field_order
-        self.x = FieldInt(x, modulus) if x is not None else x
-        self.y = FieldInt(y, modulus) if y is not None else y
-        self.z = FieldInt(z, modulus) if z is not None else z
+
+        if not isinstance(x, FieldInt): # da sie uproscic
+            self.x = FieldInt(x, modulus) if x is not None else x
+        else: 
+            self.x = x
+                
+        if not isinstance(y, FieldInt): # da sie uproscic
+            self.y = FieldInt(y, modulus) if y is not None else y
+        else: 
+            self.y = y
+        
+        if not isinstance(z, FieldInt): # da sie uproscic
+            self.z = FieldInt(z, modulus) if z is not None else z
+        else: 
+            self.z = z
+        
+        # self.x = FieldInt(x, modulus) if x is not None else x
+        # self.y = FieldInt(y, modulus) if y is not None else y
+        # self.z = FieldInt(z, modulus) if z is not None else z
 
     def convert_to_affine_point(self):
         if self.is_infinity():
@@ -111,7 +127,7 @@ class ProjectivePoint:
             x2 = u * w
             y2 = t * (v - w) - u * u * self.y * self.y * two
             z2 = u * u * u
-
+            pdb.set_trace()
             return ProjectivePoint(x=x2, y=y2, z=z2)
 
         temp = copy.deepcopy(self)
@@ -120,7 +136,7 @@ class ProjectivePoint:
         while value != 0:
             if value & 1 != 0:
                 result += temp
-            temp = temp * 2
+            temp = temp * two
             value >>= 1
 
         return result
@@ -146,7 +162,7 @@ class ProjectivePoint:
 
         if u0 == u1:
             if t0 == t1:
-                return self * 2
+                return self * FieldInt(2, modulo)
             else:
                 return ProjectivePoint.get_infinity()
         else:
