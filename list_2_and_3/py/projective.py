@@ -7,7 +7,6 @@ import math
 import dataclasses
 from typing import Optional
 from field import FieldInt
-import pdb
 
 CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y z")
 
@@ -84,7 +83,6 @@ class ProjectivePoint:
         if self.is_infinity():
             return AffinePoint.get_infinity()
         else:
-            # div = modinv(self.z, self._curve_params.field_order)
             div = self.z.reciprocal()
             x = (self.x * div).value % self._curve_params.field_order
             y = (self.y * div).value % self._curve_params.field_order
@@ -119,7 +117,6 @@ class ProjectivePoint:
 
         if value == two:
             if self.is_infinity() or self.y == zero:
-
                 return self.get_infinity()
             t = self.x * self.x * three + a * self.z * self.z
             u = self.y * self.z * two
@@ -131,14 +128,15 @@ class ProjectivePoint:
             z2 = u * u * u
             return ProjectivePoint(x=x2, y=y2, z=z2)
 
+        field_value = value 
         temp = copy.deepcopy(self)
         result = ProjectivePoint.get_infinity()
-
-        while value != 0:
-            if value & 1 != 0:
+        
+        while field_value.value != 0:
+            if field_value.value & 1 != 0:
                 result += temp
             temp = temp * two
-            value >>= 1
+            field_value.value >>= 1
 
         return result
 
@@ -169,7 +167,7 @@ class ProjectivePoint:
         else:
             t = t0 - t1
             u = u0 - u1
-            u2 = pow(u, u, modulo)
+            u2 = u * u
             v = self.z * other.z
             w = t * t * v - u2 * (u0 + u1)
             u3 = u * u2

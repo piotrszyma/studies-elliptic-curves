@@ -59,9 +59,6 @@ class TestRhoPollard(unittest.TestCase):
         result = instance.run()
 
         # Assert.
-        print('dupa')
-        import pdb
-        pdb.set_trace()
         self.assertEqual(2, result)
 
 

@@ -38,6 +38,8 @@ class FieldInt:
 		return self._create(-self.value)
 	
 	def __mul__(self, other):
+		if not isinstance(other, FieldInt):
+			return NotImplemented
 		self._check(other)
 		return self._create(self.value * other.value)
 	
