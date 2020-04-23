@@ -20,15 +20,6 @@ class CurveParams:
     field_order: int
 
 
-default_curve_params = CurveParams(
-    curve_order=807369655039,
-    field_order=807368793739,
-    a=236367012452,
-    b=74315650609,
-    base_point=CurveBasePoint(x=172235452673, y=488838007757, z=1),
-)
-
-
 def set_curve_params(curve_params: CurveParams):
     ProjectivePoint._curve_params = curve_params
 
@@ -47,7 +38,7 @@ def modinv(a, n):
 class ProjectivePoint:
     _inf = None
     _base_point = None
-    _curve_params = default_curve_params
+    _curve_params = None
     __slots__ = ("x", "y", "z")
 
     def __init__(
@@ -57,25 +48,33 @@ class ProjectivePoint:
         z: Optional[int] = None,
         inf: Optional[bool] = False,
     ):
-        modulus = self._curve_params.field_order
-        if not isinstance(x, FieldInt): # da sie uproscic
-            self.x = FieldInt(x, modulus) if x is not None else x
-        else: 
+        if not self._curve_params:
+            raise RuntimeError("Set AffinePoint curve points first.")
+        if not isinstance(x, FieldInt):  # da sie uproscic
+            self.x = FieldInt(x) if x is not None else x
+        else:
             self.x = x
-                
-        if not isinstance(y, FieldInt): # da sie uproscic
-            self.y = FieldInt(y, modulus) if y is not None else y
-        else: 
+
+        if not isinstance(y, FieldInt):  # da sie uproscic
+            self.y = FieldInt(y) if y is not None else y
+        else:
             self.y = y
-        
-        if not isinstance(z, FieldInt): # da sie uproscic
-            self.z = FieldInt(z, modulus) if z is not None else z
-        else: 
+
+        if not isinstance(z, FieldInt):  # da sie uproscic
+            self.z = FieldInt(z) if z is not None else z
+        else:
             self.z = z
-        
-        # self.x = FieldInt(x, modulus) if x is not None else x
-        # self.y = FieldInt(y, modulus) if y is not None else y
-        # self.z = FieldInt(z, modulus) if z is not None else z
+
+        if self.x:
+            self.assert_on_curve()
+
+    def assert_on_curve(self):
+        assert (
+            self.y * self.y * self.z
+            == self.x * self.x * self.x
+            + self._curve_params.a * self.x * self.z * self.z
+            + self._curve_params.b * self.z * self.z * self.z
+        ), f"{self} is not on curve."
 
     def convert_to_affine_point(self):
         if self.is_infinity():
@@ -98,24 +97,25 @@ class ProjectivePoint:
         if self.is_infinity() and other.is_infinity():
             return True
 
-        return self.x * other.z == other.x * self.z and self.y * other.z == other.y * self.z
+        return (
+            self.x * other.z == other.x * self.z
+            and self.y * other.z == other.y * self.z
+        )
 
     def __ne__(self, other: "ProjectivePoint") -> bool:
         return not (self == other)
 
     def __mul__(self, value: FieldInt) -> "ProjectivePoint":
-        modulus = self._curve_params.field_order
-        
         if isinstance(value, int):
-            value = FieldInt(value, modulus)
+            value = FieldInt(value)
 
         if not isinstance(value, FieldInt):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
-        
-        two = FieldInt(2, modulus)
-        three = FieldInt(3, modulus)
-        a = FieldInt(self._curve_params.a, modulus)
-        zero = FieldInt(0, modulus)
+
+        two = FieldInt(2)
+        three = FieldInt(3)
+        a = FieldInt(self._curve_params.a)
+        zero = FieldInt(0)
 
         if value == two:
             if self.is_infinity() or self.y == zero:
@@ -130,10 +130,10 @@ class ProjectivePoint:
             z2 = u * u * u
             return ProjectivePoint(x=x2, y=y2, z=z2)
 
-        field_value = value 
+        field_value = value
         temp = copy.deepcopy(self)
         result = ProjectivePoint.get_infinity()
-        
+
         while field_value.value != 0:
             if field_value.value & 1 != 0:
                 result += temp
@@ -163,7 +163,7 @@ class ProjectivePoint:
 
         if u0 == u1:
             if t0 == t1:
-                return self * FieldInt(2, modulo)
+                return self * FieldInt(2)
             else:
                 return ProjectivePoint.get_infinity()
         else:

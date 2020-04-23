@@ -6,6 +6,7 @@ import pollard_rho_affine
 import affine
 import pollard_rho_projective
 import projective
+import field
 import shared
 
 
@@ -23,28 +24,24 @@ def create_curve_params(raw_json, ec_type):
     base_point = raw_json["basePoint"]
     field_order = raw_json["fieldOrder"]
     curve_order = raw_json["curveOrder"]
+    curve_params = shared.CurveParams(
+        base_point=shared.CurveBasePoint(*base_point),
+        a=a,
+        b=b,
+        field_order=field_order,
+        curve_order=curve_order,
+    )
+    affine.set_curve_params(curve_params)
+    projective.set_curve_params(curve_params)
+    field.set_modulus(field_order)
+    return curve_params
 
-    if ec_type == "affine":
-        params = affine.CurveParams(
-            base_point=affine.CurveBasePoint(
-                *base_point[:2],
-            ),
-            a=a,
-            b=b,
-            field_order=field_order,
-            curve_order=curve_order
-        )
-    else:
-        params = projective.CurveParams(
-            base_point=projective.CurveBasePoint(
-                *base_point,
-            ),
-            a=a,
-            b=b,
-            field_order=field_order,
-            curve_order=curve_order
-        )
-    return params
+
+def _print_results(params: shared.CurveParams, x_found):
+    mul_calculated = x_found * params.base_point
+    print(f"x_found * base_point = {mul_calculated}, mul_real={params.mul_point}")
+    assert mul_calculated == params.mul_point, "Failed to find point."
+    print("Successfully found point!")
 
 
 def run_affine(curve_params):
@@ -52,14 +49,7 @@ def run_affine(curve_params):
     instance = pollard_rho_affine.EcAffinePollardRhoDL(params)
     with timer.timeit("PollardRhoDL algorithm"):
         x_found = instance.run()
-
-    print(f"x_found: {x_found}")
-
-    real = curve_params.base_point_y
-    # restored = pow(curve_params.g_prim, x_found, params.p)
-
-    # print(f"Real: g_prim^x = {real}, restored: g_prim^x_found {restored}")
-    # pollard_rho_affine.run()
+    _print_results(params, x_found)
 
 
 def run_projective(curve_params):
@@ -68,8 +58,7 @@ def run_projective(curve_params):
 
     with timer.timeit("PollardRhoDL algorithm"):
         x_found = instance.run()
-
-    print(f"x_found: {x_found}")
+    _print_results(params, x_found)
 
 
 if __name__ == "__main__":
@@ -91,6 +80,3 @@ if __name__ == "__main__":
         run_affine(curve_params)
     else:
         run_projective(curve_params)
-
-    # RUN FROM DIR /list_2_and_3/py/ !
-    # bash ../sage/generate.sh 12 > python3 main.py projective

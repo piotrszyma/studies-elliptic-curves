@@ -1,21 +1,24 @@
 import unittest
+import unittest.mock as mock
 
-from affine import AffinePoint, set_curve_params, CurveBasePoint, CurveParams
+from affine import AffinePoint, set_curve_params
+from shared import CurveBasePoint, CurveParams
+import field
 
 
 class AffinePointTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        set_curve_params(
-            CurveParams(
+        curve_params = CurveParams(
                 base_point=CurveBasePoint(172235452673, 488838007757),
                 a=236367012452,
                 b=74315650609,
                 field_order=807368793739,
                 curve_order=807369655039,
             )
-        )
+        set_curve_params(curve_params)
+        field.set_modulus(curve_params.field_order)
 
 
 class TestAffinePointMultiplicationByScalar(AffinePointTestCase):
@@ -29,6 +32,7 @@ class TestAffinePointMultiplicationByScalar(AffinePointTestCase):
         # Assert.
         self.assertEqual(result, point_at_inf)
 
+    @mock.patch.object(AffinePoint, 'assert_on_curve', new=mock.MagicMock())
     def test_point_with_y_equal_zero_multiplied_should_be_infinity(self):
         # Arrange.
         # Ugly sets y to 0 without respecting x.
@@ -42,6 +46,8 @@ class TestAffinePointMultiplicationByScalar(AffinePointTestCase):
 
 
 class TestAffinePointAddition(AffinePointTestCase):
+    
+    @mock.patch.object(AffinePoint, 'assert_on_curve', new=mock.MagicMock())
     def test_point_at_infinity_plus_other_should_be_that_other(self):
         # Arrange.
         point = AffinePoint(1234, 5678)
@@ -55,6 +61,7 @@ class TestAffinePointAddition(AffinePointTestCase):
         self.assertEqual(result_lhs, result_rhs)
         self.assertEqual(result_rhs, point)
 
+    @mock.patch.object(AffinePoint, 'assert_on_curve', new=mock.MagicMock())
     def test_two_points_with_same_x_should_sum_to_infinity(self):
         # Arrange.
         # Ugly sets xs to same value.

@@ -4,26 +4,8 @@ import copy
 import math
 import dataclasses
 from typing import Optional
-
-CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y")
-
-
-@dataclasses.dataclass
-class CurveParams:
-    base_point: CurveBasePoint
-    a: int
-    b: int
-    curve_order: int
-    field_order: int
-
-
-default_curve_params = CurveParams(
-    curve_order=807369655039,
-    field_order=807368793739,
-    a=236367012452,
-    b=74315650609,
-    base_point=CurveBasePoint(x=172235452673, y=488838007757),
-)
+from field import FieldInt
+from shared import CurveParams
 
 
 def set_curve_params(curve_params: CurveParams):
@@ -31,33 +13,60 @@ def set_curve_params(curve_params: CurveParams):
 
 
 def modinv(a, n):
+    a = a if isinstance(a, int) else a.value
+    n = n if isinstance(n, int) else n.value
     b, c = 1, 0
     while n:
         q, r = divmod(a, n)
         a, b, c, n = n, c, b - q * c, r
     # at this point a is the gcd of the original inputs
     if a == 1:
-        return b
+        return FieldInt(b)
     raise ValueError(f"{a} is not invertible modulo {n}")
 
 
 class AffinePoint:
     _inf = None
     _base_point = None
-    _curve_params = default_curve_params
+    _curve_params = None
     __slots__ = ("x", "y")
 
     def __init__(
         self,
-        x: Optional[int] = None,
-        y: Optional[int] = None,
+        x: Optional[FieldInt] = None,
+        y: Optional[FieldInt] = None,
         inf: Optional[bool] = False,
     ):
-        self.x = x % self._curve_params.field_order if x else x
-        self.y = y % self._curve_params.field_order if y else y
+
+        if self._curve_params is None:
+            raise RuntimeError("Set AffinePoint curve points first.")
+
+        if x:
+            assert y
+
+        if isinstance(x, int):
+            x = FieldInt(x)
+
+        if isinstance(y, int):
+            y = FieldInt(y)
+
+        self.x = x
+        self.y = y
+
+        if self.x is not None:
+            self.assert_on_curve()
+
+    def assert_on_curve(self):
+        assert (
+            self.y * self.y
+            == self.x * self.x * self.x
+            + self._curve_params.a * self.x
+            + self._curve_params.b
+        ), f"{self} not on curve."
 
     def convert_to_projective_point(self):
         from projective import ProjectivePoint
+
         if self.is_infinity():
             return ProjectivePoint.get_infinity()
         else:
@@ -82,17 +91,14 @@ class AffinePoint:
         if not isinstance(value, int):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
 
-        value = value % self._curve_params.field_order
-
         if value == 2:  # TODO: migrate to Fields
             if self.is_infinity() or self.y == 0:
                 return self.get_infinity()
 
-            s = (
-                pow(self.x, 2, self._curve_params.field_order) * 3
-                + self._curve_params.a
-            ) * modinv(2 * self.y, self._curve_params.field_order)
-            x2 = pow(s, 2, self._curve_params.field_order) - 2 * self.x
+            s = ((self.x ** 2) * 3 + self._curve_params.a) * modinv(
+                2 * self.y, self._curve_params.field_order
+            )
+            x2 = (s ** 2) - 2 * self.x
             y2 = (s * (self.x - x2)) - self.y
 
             return AffinePoint(x=x2, y=y2)

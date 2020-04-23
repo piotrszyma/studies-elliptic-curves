@@ -1,8 +1,13 @@
 import unittest
+import unittest.mock as mock
+
+
 from field import FieldInt
+import field
 
 import projective
 import affine
+import shared
 from affine import AffinePoint
 from projective import ProjectivePoint
 
@@ -16,31 +21,22 @@ class ProjectivePointTestCase(unittest.TestCase):
         b = 74315650609
         field_order = 807368793739
         curve_order = 807369655039
-    
-        projective.set_curve_params(
-            projective.CurveParams(
-                base_point=projective.CurveBasePoint(*base_point),
-                a=a,
-                b=b,
-                field_order=field_order,
-                curve_order=curve_order,
-            )
+        curve_params = shared.CurveParams(
+            base_point=shared.CurveBasePoint(*base_point),
+            a=a,
+            b=b,
+            field_order=field_order,
+            curve_order=curve_order,
         )
-        affine.set_curve_params(
-            affine.CurveParams(
-                base_point=affine.CurveBasePoint(*base_point[:2]),
-                a=a,
-                b=b,
-                field_order=field_order,
-                curve_order=curve_order,
-            )
-        )
+        projective.set_curve_params(curve_params)
+        affine.set_curve_params(curve_params)
+        field.set_modulus(field_order)
 
 
 class TestProjectivePointConversion(ProjectivePointTestCase):
     def test_conversion_to_affine_and_back(self):
         # Arrange.
-        projective_point = ProjectivePoint(2928, 42354, 1)
+        projective_point = ProjectivePoint(172235452673, 488838007757, 1)
         # Act.
         affine_point = projective_point.convert_to_affine_point()
         projective_point_from_affine = affine_point.convert_to_projective_point()
@@ -52,28 +48,28 @@ class TestProjectivePointMultiplicationByScalar(ProjectivePointTestCase):
     def test_point_at_infinitity_times_scalar_should_be_infinity(self):
         # Arrange.
         point_at_inf = ProjectivePoint.get_infinity()
-        modulus = ProjectivePoint._curve_params.field_order
         # Act.
-        result = point_at_inf * FieldInt(2, modulus)
+        result = point_at_inf * FieldInt(2)
 
         # Assert.
         self.assertEqual(result, point_at_inf)
 
+    @mock.patch.object(ProjectivePoint, "assert_on_curve", new=mock.MagicMock())
     def test_point_with_y_equal_zero_multiplied_should_be_infinity(self):
         # Arrange.
         # Ugly sets y to 0 without respecting x.
-        modulus = ProjectivePoint._curve_params.field_order
         point_with_y_zero = ProjectivePoint(2, 0, 1)
 
         # Act.
-        result = point_with_y_zero * FieldInt(2, modulus)
+        result = point_with_y_zero * FieldInt(2)
 
         # Assert.
         self.assertTrue(result.is_infinity())
 
 
 class TestProjectivePointAddition(ProjectivePointTestCase):
-
+    @mock.patch.object(ProjectivePoint, "assert_on_curve", new=mock.MagicMock())
+    @mock.patch.object(AffinePoint, "assert_on_curve", new=mock.MagicMock())
     def test_point_at_infinity_plus_other_should_be_that_other(self):
         # Arrange.
         point = AffinePoint(1234, 5678)
@@ -84,11 +80,11 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
         # Act.
         result_rhs = projective_point + point_at_inf
         result_lhs = point_at_inf + projective_point
-
         # Assert.
         self.assertEqual(result_lhs, result_rhs)
         self.assertEqual(result_rhs, projective_point)
 
+    @mock.patch.object(ProjectivePoint, "assert_on_curve", new=mock.MagicMock())
     def test_two_points_with_same_x_should_sum_to_infinity(self):
         # Arrange.
         # Ugly sets xs to same value.
@@ -115,30 +111,31 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
     def test_mul(self):
         # Arrange.
         point = AffinePoint(172235452673, 488838007757).convert_to_projective_point()
-        modulo = point._curve_params.field_order
+        modulus = point._curve_params.field_order
+        field.set_modulus(modulus)
 
         # Act.
-        point_mul_0 = FieldInt(2, modulo) * point
-        point_mul_1 = point * FieldInt(2137, modulo)
-        point_mul_2 = FieldInt(741274052018, modulo) * point
-        point_mul_3 = point * FieldInt(649074375334, modulo)
+        point_mul_0 = FieldInt(2) * point
+        point_mul_1 = point * FieldInt(2137)
+        point_mul_2 = FieldInt(741274052018) * point
+        point_mul_3 = point * FieldInt(649074375334)
 
         # Assert.
         self.assertEqual(
             AffinePoint(215387987039, 765000578277),
-            point_mul_0.convert_to_affine_point()
+            point_mul_0.convert_to_affine_point(),
         )
         self.assertEqual(
             AffinePoint(464122625441, 361301908555),
-            point_mul_1.convert_to_affine_point()
+            point_mul_1.convert_to_affine_point(),
         )
         self.assertEqual(
             AffinePoint(702787153408, 513816894152),
-            point_mul_2.convert_to_affine_point()
+            point_mul_2.convert_to_affine_point(),
         )
         self.assertEqual(
             AffinePoint(748235734737, 753279782927),
-            point_mul_3.convert_to_affine_point()
+            point_mul_3.convert_to_affine_point(),
         )
 
     def test_add(self):
@@ -153,10 +150,11 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
         # Assert.
         self.assertEqual(
             AffinePoint(198482119007, 191241681320),
-            point_add_1.convert_to_affine_point())
+            point_add_1.convert_to_affine_point(),
+        )
         self.assertEqual(
             AffinePoint(215387987039, 765000578277),
-            point_add_2.convert_to_affine_point()
+            point_add_2.convert_to_affine_point(),
         )
 
     def test_mix_of_add_and_mul(self):
@@ -165,7 +163,7 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
         modulo = point._curve_params.field_order
 
         # Act.
-        two_mul_point = FieldInt(2, modulo) * point
+        two_mul_point = FieldInt(2) * point
         point_add_point = point + point
 
         # Assert.

@@ -1,64 +1,73 @@
+
+MODULUS = None
+
+
+def set_modulus(modulus):
+    global MODULUS 
+    MODULUS = modulus
+
+
 class FieldInt:
 
-    # -- Instance management methods --
-    def __init__(self, value, modulus):
-        if not isinstance(value, int) or not isinstance(modulus, int):
-            raise TypeError("Expected integers")
-        if modulus <= 0:
-            raise ValueError("Modulus must be positive")
-        if not (0 <= value < modulus):
-            raise ValueError("Value out of range")
-        self.value = value
-        self.modulus = modulus
-
-    def _create(self, val):
-        return FieldInt(val % self.modulus, self.modulus)
-
-    def _check(self, other):
-        if not isinstance(other, FieldInt):
-            raise TypeError("Expected FieldInt")
-        if self.modulus != other.modulus:
-            raise ValueError("Other number must have same modulus")
-
-    # -- Arithmetic methods --
+    def __init__(self, value):
+        
+        if MODULUS is None:
+            raise RuntimeError('First field.set_modulus(...)')
+        
+        self.value = value % MODULUS
 
     def __add__(self, other):
-        self._check(other)
-        return self._create(self.value + other.value)
-
-    def __sub__(self, other):
-        self._check(other)
-        return self._create(self.value - other.value)
-
-    def __neg__(self):
-        return self._create(-self.value)
-
-    def __mul__(self, other):
+        if isinstance(other, int):
+            other = FieldInt(other)
         if not isinstance(other, FieldInt):
             return NotImplemented
-        self._check(other)
-        return self._create(self.value * other.value)
+        return FieldInt(self.value + other.value)
+
+    def __sub__(self, other):
+        if isinstance(other, int):
+            other = FieldInt(other)
+        if not isinstance(other, FieldInt):
+            return NotImplemented
+        return FieldInt(self.value - other.value)
+
+    def __neg__(self):
+        return FieldInt(-self.value)
+
+    def __mul__(self, other):
+        if isinstance(other, int):
+            other = FieldInt(other)
+        if not isinstance(other, FieldInt):
+            return NotImplemented
+        return FieldInt(self.value * other.value)
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
 
     def reciprocal(self):
         if self.value == 0:
             raise ValueError("Division by zero")
         # Extended Euclidean algorithm
-        x, y = self.modulus, self.value
+        x, y = MODULUS, self.value
         a, b = 0, 1
         while y != 0:
             a, b = b, a - x // y * b
             x, y = y, x % y
         if x == 1:
-            return self._create(a)
+            return FieldInt(a)
         else:
             raise ValueError("Value and modulus not coprime")
 
-    def __mod__(self, value):
-        return self.value % value
-    # -- Comparison methods --
+    def __mod__(self, other):
+        return self.value % other
+
+    def __pow__(self, other):
+        result = pow(self.value, other, MODULUS)
+        return FieldInt(result)
 
     def __eq__(self, other):
-        return isinstance(other, FieldInt) and (self.value, self.modulus) == (other.value, other.modulus)
+        if isinstance(other, int):
+            other = FieldInt(other)
+        return isinstance(other, FieldInt) and self.value == other.value
 
     def __ne__(self, other):
         return not (self == other)
@@ -69,4 +78,4 @@ class FieldInt:
         return str(self.value)
 
     def __repr__(self):
-        return f"FieldInt(value={self.value}, modulus={self.modulus})"
+        return f"FieldInt(value={getattr(self, 'value', '???')})"

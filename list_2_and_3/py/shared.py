@@ -1,7 +1,11 @@
-import collections
 import dataclasses
 
-CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y z")
+
+@dataclasses.dataclass
+class CurveBasePoint:
+    x: int
+    y: int
+    z: int = 1
 
 
 @dataclasses.dataclass
