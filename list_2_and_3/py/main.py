@@ -20,7 +20,7 @@ def read_sage_params_from_stdin():
 
 
 def create_curve_params(raw_json, ec_type):
-    a, b = raw_json["invariants"][0], raw_json["invariants"][1]
+    a, b, *_ = raw_json["invariants"]
     base_point = raw_json["basePoint"]
     field_order = raw_json["fieldOrder"]
     curve_order = raw_json["curveOrder"]
@@ -39,7 +39,7 @@ def create_curve_params(raw_json, ec_type):
 
 def _print_results(params: shared.CurveParams, x_found):
     mul_calculated = x_found * params.base_point
-    print(f"x_found * base_point = {mul_calculated}, mul_real={params.mul_point}")
+    print(f"x_found * base_point = {mul_calculated}, mul_real = {params.mul_point}")
     assert mul_calculated == params.mul_point, "Failed to find point."
     print("Successfully found point!")
 
@@ -47,7 +47,7 @@ def _print_results(params: shared.CurveParams, x_found):
 def run_affine(curve_params):
     params = pollard_rho_affine.generate_params(curve_params)
     instance = pollard_rho_affine.EcAffinePollardRhoDL(params)
-    with timer.timeit("PollardRhoDL algorithm"):
+    with timer.timeit("PollardRhoDL algorithm on affine coordinates."):
         x_found = instance.run()
     _print_results(params, x_found)
 
@@ -55,8 +55,7 @@ def run_affine(curve_params):
 def run_projective(curve_params):
     params = pollard_rho_projective.generate_params(curve_params)
     instance = pollard_rho_projective.EcProjectivePollardRhoDL(params)
-
-    with timer.timeit("PollardRhoDL algorithm"):
+    with timer.timeit("PollardRhoDL algorithm on projective coordinates."):
         x_found = instance.run()
     _print_results(params, x_found)
 
