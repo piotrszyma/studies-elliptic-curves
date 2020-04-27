@@ -49,26 +49,30 @@ class ProjectivePoint:
         inf: Optional[bool] = False,
     ):
         if not self._curve_params:
-            raise RuntimeError("Set AffinePoint curve points first.")
-        if not isinstance(x, FieldInt):  # da sie uproscic
+            raise RuntimeError("Set ProjectivePoint curve params first.")
+
+        if not isinstance(x, FieldInt):
             self.x = FieldInt(x) if x is not None else x
         else:
             self.x = x
 
-        if not isinstance(y, FieldInt):  # da sie uproscic
+        if not isinstance(y, FieldInt):
             self.y = FieldInt(y) if y is not None else y
         else:
             self.y = y
 
-        if not isinstance(z, FieldInt):  # da sie uproscic
+        if not isinstance(z, FieldInt):
             self.z = FieldInt(z) if z is not None else z
         else:
             self.z = z
 
-        if self.x:
-            self.assert_on_curve()
+        # if self.y: # TODO: when?
+        self.assert_on_curve()
 
     def assert_on_curve(self):
+        if self.is_infinity():
+            return True
+
         assert (
             self.y * self.y * self.z
             == self.x * self.x * self.x
@@ -87,7 +91,7 @@ class ProjectivePoint:
 
     def __repr__(self):
         if self.is_infinity():
-            return "ProjectivePoint(at infinity)"
+            return f"ProjectivePoint({self.x}, {self.y}, {self.z}) - infinity"
         return f"ProjectivePoint({self.x}, {self.y}, {self.z})"
 
     def __eq__(self, other: "ProjectivePoint") -> bool:
@@ -148,13 +152,12 @@ class ProjectivePoint:
     def __add__(self, other: "ProjectivePoint") -> "ProjectivePoint":
         if not isinstance(other, ProjectivePoint):
             raise NotImplementedError(f"Cannot add {type(self)} and {type(other)}")
+
         if self.is_infinity():
             return other
 
         if other.is_infinity():
             return self
-
-        modulo = self._curve_params.field_order
 
         t0 = self.y * other.z
         t1 = other.y * self.z
@@ -188,22 +191,54 @@ class ProjectivePoint:
         return ProjectivePoint(x=self.x, y=-self.y, z=self.z)
 
     def is_infinity(self):
-        return self.x is None and self.y is None
+        return self.x is None and self.z is None
 
     @classmethod
     def random(cls):
-        return cls.get_base_point() * random.randint(2, cls._curve_params.curve_order)
+        base_point = ProjectivePoint(
+            cls.get_base_point().x,
+            cls.get_base_point().y,
+            cls.get_base_point().z
+        )
+        random_value = FieldInt(random.randint(2, cls._curve_params.curve_order))
+        return base_point * random_value
+
+    @classmethod
+    def get_random_number(cls):
+        return FieldInt(random.randint(2, cls._curve_params.curve_order))
 
     @classmethod
     def get_infinity(cls):
         if cls._inf:
             return cls._inf
-        cls._inf = cls()
+        cls._inf = cls(None, 1, None)
         return cls._inf
 
     @classmethod
     def get_base_point(cls):
         if cls._base_point:
             return cls._base_point
-        cls._base_point = cls(*cls._curve_params.base_point)
+        cls._base_point = cls._curve_params.base_point
         return cls._base_point
+
+
+if __name__ == "__main__":
+    import pdb
+    import shared
+    import field
+    base_point = [605600, 205394, 1]
+    a = 34328
+    b = 354946
+    field_order = 649283
+    curve_order = 650011
+    curve_params = shared.CurveParams(
+        base_point=shared.CurveBasePoint(*base_point),
+        a=a,
+        b=b,
+        field_order=field_order,
+        curve_order=curve_order,
+    )
+    field.set_modulus(field_order)
+    set_curve_params(curve_params)
+
+    # TODO: (x1, 0, z1) + (k*x1,0,k*z1) => (x1,0,z1)

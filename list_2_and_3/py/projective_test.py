@@ -68,21 +68,22 @@ class TestProjectivePointMultiplicationByScalar(ProjectivePointTestCase):
 
 
 class TestProjectivePointAddition(ProjectivePointTestCase):
+
     @mock.patch.object(ProjectivePoint, "assert_on_curve", new=mock.MagicMock())
     @mock.patch.object(AffinePoint, "assert_on_curve", new=mock.MagicMock())
     def test_point_at_infinity_plus_other_should_be_that_other(self):
-        # Arrange.
-        point = AffinePoint(1234, 5678)
-        projective_point = point.convert_to_projective_point()
 
-        point_at_inf = ProjectivePoint.get_infinity()
+        # Arrange.
+        point = ProjectivePoint(172235452673, 488838007757, 1)
+        point_at_inf = ProjectivePoint(None, 5, None)
 
         # Act.
-        result_rhs = projective_point + point_at_inf
-        result_lhs = point_at_inf + projective_point
+        result_rhs = point + point_at_inf
+        result_lhs = point_at_inf + point
+
         # Assert.
         self.assertEqual(result_lhs, result_rhs)
-        self.assertEqual(result_rhs, projective_point)
+        self.assertEqual(result_rhs, point)
 
     @mock.patch.object(ProjectivePoint, "assert_on_curve", new=mock.MagicMock())
     def test_two_points_with_same_x_should_sum_to_infinity(self):
@@ -160,7 +161,6 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
     def test_mix_of_add_and_mul(self):
         # Arrange.
         point = AffinePoint(172235452673, 488838007757).convert_to_projective_point()
-        modulo = point._curve_params.field_order
 
         # Act.
         two_mul_point = FieldInt(2) * point
@@ -173,6 +173,18 @@ class TestProjectivePointAddition(ProjectivePointTestCase):
 
         self.assertEqual(two_mul_point, AffinePoint(215387987039, 765000578277))
         self.assertEqual(two_mul_point, point_add_point)
+
+    def test_addition_of_multiplied_point(self):
+        # Arrange
+        k = ProjectivePoint.get_random_number()
+        point1 = ProjectivePoint.random()
+        point2 = ProjectivePoint(k * point1.x, k * point1.y, k * point1.z)
+
+        # Act
+        result = point1 + point2
+
+        # Assert
+        self.assertEqual(result, 2 * point1)
 
 
 if __name__ == "__main__":
