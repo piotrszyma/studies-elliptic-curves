@@ -5,7 +5,6 @@ import math
 from typing import Tuple, Any
 
 import shared
-import affine
 
 Point = Any
 
@@ -16,15 +15,15 @@ class Coeffs:
     beta: int = 0
 
 
-def _in_s1(point: affine.AffinePoint):
+def _in_s1(point: Point):
     return point.x % 3 == 1
 
 
-def _in_s2(point: affine.AffinePoint):
+def _in_s2(point: Point):
     return point.x % 3 == 0
 
 
-def _in_s3(point: affine.AffinePoint):
+def _in_s3(point: Point):
     return point.x % 3 == 2
 
 
