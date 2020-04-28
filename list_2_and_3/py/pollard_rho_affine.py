@@ -1,12 +1,8 @@
 import dataclasses
 import random
-import copy
-import math
 
-from typing import Tuple
-
-import shared
 import affine
+import pollard_rho_base
 
 
 @dataclasses.dataclass
@@ -45,78 +41,9 @@ def generate_params(curve_params: affine.CurveParams) -> EcAffinePollardRhoDLPar
     )
 
 
-def _in_s1(point: affine.AffinePoint):
-    return point.x % 3 == 1
-
-
-def _in_s2(point: affine.AffinePoint):
-    return point.x % 3 == 0
-
-
-def _in_s3(point: affine.AffinePoint):
-    return point.x % 3 == 2
-
-
-class EcAffinePollardRhoDL:
+class EcAffinePollardRhoDL(pollard_rho_base.AbstractEcPollardRhoDL):
     def __init__(self, params: EcAffinePollardRhoDLParams):
         self.base_point: affine.AffinePoint = params.base_point
         self.mul_point: affine.AffinePoint = params.mul_point
         self.field_order: int = params.field_order
         self.curve_order: int = params.curve_order
-
-    def _f(self, values: Tuple[affine.AffinePoint, Coeffs]) -> Tuple[int, Coeffs]:
-        value, coeffs = values
-        if _in_s1(value):
-            coeffs.alpha += 1
-            coeffs.alpha %= self.curve_order
-            return value + self.base_point, coeffs
-        elif _in_s2(value):
-            coeffs.alpha *= 2
-            coeffs.alpha %= self.curve_order
-            coeffs.beta *= 2
-            coeffs.beta %= self.curve_order
-            return value * 2, coeffs
-        elif _in_s3(value):
-            coeffs.beta += 1
-            coeffs.beta %= self.curve_order
-            return value + self.mul_point, coeffs
-        else:
-            raise RuntimeError("Impossibru.")
-
-    def _walk(self):
-        slow = copy.deepcopy(self.base_point)
-        fast = copy.deepcopy(self.base_point)
-        slow_coeffs = Coeffs(alpha=1, beta=0)
-        fast_coeffs = Coeffs(alpha=1, beta=0)
-
-        while True:
-
-            slow, slow_coeffs = self._f((slow, slow_coeffs))
-            fast, fast_coeffs = self._f(self._f((fast, fast_coeffs)))
-
-            if slow == fast:  # Slow meets fast.
-                break
-
-        assert math.gcd(fast_coeffs.beta - slow_coeffs.beta, self.field_order) == 1
-
-        assert (
-            slow_coeffs.alpha * self.base_point + slow_coeffs.beta * self.mul_point
-            == fast_coeffs.alpha * self.base_point + fast_coeffs.beta * self.mul_point
-        )
-
-        alphas_diff = slow_coeffs.alpha - fast_coeffs.alpha
-        betas_diff = fast_coeffs.beta - slow_coeffs.beta
-        betas_inv = shared.modinv(betas_diff, self.curve_order)
-        result = (alphas_diff * betas_inv) % self.curve_order
-        return result
-
-    def run(self):
-        return self._walk()
-
-
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    main()
