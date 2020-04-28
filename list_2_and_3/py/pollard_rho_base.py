@@ -15,16 +15,16 @@ class Coeffs:
     beta: int = 0
 
 
-def _in_s1(point: Point):
-    return point.x % 3 == 1
+def _in_s1(value: Point):
+    return value.x % 3 == 1
 
 
-def _in_s2(point: Point):
-    return point.x % 3 == 0
+def _in_s2(value: Point):
+    return value.x % 3 == 0
 
 
-def _in_s3(point: Point):
-    return point.x % 3 == 2
+def _in_s3(value: Point):
+    return value.x % 3 == 2
 
 
 class AbstractEcPollardRhoDL:
