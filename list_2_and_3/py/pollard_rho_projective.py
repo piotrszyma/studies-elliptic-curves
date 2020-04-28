@@ -2,9 +2,10 @@ import dataclasses
 import random
 import copy
 import math
-from typing import Tuple, Optional
 
-import timer
+from typing import Tuple
+
+import shared
 import projective
 
 
@@ -28,22 +29,11 @@ class Coeffs:
     beta: int = 0
 
 
-def modinv(a, n):
-    b, c = 1, 0
-    while n:
-        q, r = divmod(a, n)
-        a, b, c, n = n, c, b - q * c, r
-    # at this point a is the gcd of the original inputs
-    if a == 1:
-        return b
-    raise ValueError(f"{a} is not invertible modulo {n}")
-
-
-def generate_params(curve_params: projective.CurveParams) -> EcProjectivePollardRhoDLParams:
+def generate_params(
+    curve_params: projective.CurveParams,
+) -> EcProjectivePollardRhoDLParams:
     base_point = projective.ProjectivePoint(
-        curve_params.base_point.x,
-        curve_params.base_point.y,
-        curve_params.base_point.z
+        curve_params.base_point.x, curve_params.base_point.y, curve_params.base_point.z
     )
 
     k = random.randint(2, curve_params.curve_order)
@@ -75,7 +65,9 @@ class EcProjectivePollardRhoDL:
         self.field_order: int = params.field_order
         self.curve_order: int = params.curve_order
 
-    def _f(self, values: Tuple[projective.ProjectivePoint, Coeffs]) -> Tuple[int, Coeffs]:
+    def _f(
+        self, values: Tuple[projective.ProjectivePoint, Coeffs]
+    ) -> Tuple[int, Coeffs]:
         value, coeffs = values
         if _in_s1(value):
             # assert coeffs.alpha * self.base_point + coeffs.beta * self.mul_point == value
@@ -114,16 +106,14 @@ class EcProjectivePollardRhoDL:
         assert math.gcd(fast_coeffs.beta - slow_coeffs.beta, self.field_order) == 1
 
         assert (
-            slow_coeffs.alpha * self.base_point + slow_coeffs.beta * self.mul_point ==
-            fast_coeffs.alpha * self.base_point + fast_coeffs.beta * self.mul_point
+            slow_coeffs.alpha * self.base_point + slow_coeffs.beta * self.mul_point
+            == fast_coeffs.alpha * self.base_point + fast_coeffs.beta * self.mul_point
         )
 
         alphas_diff = slow_coeffs.alpha - fast_coeffs.alpha
         betas_diff = fast_coeffs.beta - slow_coeffs.beta
-        betas_inv = modinv(betas_diff, self.curve_order)
-
+        betas_inv = shared.modinv(betas_diff, self.curve_order)
         result = (alphas_diff * betas_inv) % self.curve_order
-
         return result
 
     def run(self):
@@ -132,26 +122,6 @@ class EcProjectivePollardRhoDL:
 
 def main():
     pass
-    # curve_params = projective.CurveParams(
-    #     base_point=projective.CurveBasePoint(172235452673, 488838007757),
-    #     a=236367012452,
-    #     b=74315650609,
-    #     field_order=807368793739,
-    #     curve_order=807369655039,
-    # )
-    # params = generate_params(curve_params)
-    # print(f"Running for {curve_params}")
-    # instance = EcProjectivePollardRhoDL(params)
-
-    # with timer.timeit("PollardRhoDL algorithm"):
-    #     x_found = instance.run()
-
-    # print(f"x_found: {x_found}")
-
-    # real = params.y
-    # restored = pow(params.g_prim, x_found, params.p)
-
-    # print(f"Real: g_prim^x = {real}, restored: g_prim^x_found {restored}")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+import shared
+
 
 MODULUS = None
 
@@ -46,16 +48,7 @@ class FieldInt:
     def inverse(self):
         if self.value == 0:
             raise ValueError("Division by zero")
-        # Extended Euclidean algorithm
-        x, y = MODULUS, self.value
-        a, b = 0, 1
-        while y != 0:
-            a, b = b, a - x // y * b
-            x, y = y, x % y
-        if x == 1:
-            return FieldInt(a)
-        else:
-            raise ValueError("Value and modulus not coprime")
+        return FieldInt(shared.modinv(self.value, MODULUS))
 
     def __mod__(self, other):
         return self.value % other

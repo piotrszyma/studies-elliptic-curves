@@ -12,19 +12,6 @@ def set_curve_params(curve_params: CurveParams):
     AffinePoint._curve_params = curve_params
 
 
-def modinv(a, n):
-    a = a if isinstance(a, int) else a.value
-    n = n if isinstance(n, int) else n.value
-    b, c = 1, 0
-    while n:
-        q, r = divmod(a, n)
-        a, b, c, n = n, c, b - q * c, r
-    # at this point a is the gcd of the original inputs
-    if a == 1:
-        return FieldInt(b)
-    raise ValueError(f"{a} is not invertible modulo {n}")
-
-
 class AffinePoint:
     _inf = None
     _base_point = None
@@ -95,9 +82,7 @@ class AffinePoint:
             if self.is_infinity() or self.y == 0:
                 return self.get_infinity()
 
-            s = ((self.x ** 2) * 3 + self._curve_params.a) * modinv(
-                2 * self.y, self._curve_params.field_order
-            )
+            s = ((self.x ** 2) * 3 + self._curve_params.a) * (2 * self.y).inverse()
             x2 = (s ** 2) - 2 * self.x
             y2 = (s * (self.x - x2)) - self.y
 
@@ -132,9 +117,7 @@ class AffinePoint:
                 return self * 2
             return AffinePoint.get_infinity()
 
-        s = (self.y - other.y) * modinv(
-            self.x - other.x, self._curve_params.field_order
-        )
+        s = (self.y - other.y) * (self.x - other.x).inverse()
 
         x_ = s ** 2 - self.x - other.x
         y_ = s * (self.x - x_) - self.y

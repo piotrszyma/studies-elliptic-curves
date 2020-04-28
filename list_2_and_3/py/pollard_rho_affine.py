@@ -2,9 +2,10 @@ import dataclasses
 import random
 import copy
 import math
-from typing import Tuple, Optional
 
-import timer
+from typing import Tuple
+
+import shared
 import affine
 
 
@@ -56,17 +57,6 @@ def _in_s3(point: affine.AffinePoint):
     return point.x % 3 == 2
 
 
-def modinv(a, n):
-    b, c = 1, 0
-    while n:
-        q, r = divmod(a, n)
-        a, b, c, n = n, c, b - q * c, r
-    # at this point a is the gcd of the original inputs
-    if a == 1:
-        return b
-    raise ValueError(f"{a} is not invertible modulo {n}")
-
-
 class EcAffinePollardRhoDL:
     def __init__(self, params: EcAffinePollardRhoDLParams):
         self.base_point: affine.AffinePoint = params.base_point
@@ -116,14 +106,8 @@ class EcAffinePollardRhoDL:
 
         alphas_diff = slow_coeffs.alpha - fast_coeffs.alpha
         betas_diff = fast_coeffs.beta - slow_coeffs.beta
-        betas_inv = modinv(betas_diff, self.curve_order)
-
+        betas_inv = shared.modinv(betas_diff, self.curve_order)
         result = (alphas_diff * betas_inv) % self.curve_order
-
-        # found_mul = (slow_coeffs.alpha - fast_coeffs.alpha) // (
-        #     fast_coeffs.beta - slow_coeffs.beta
-        # )
-        # Return found_mul being ECDL such that base_pount * found_mul = mul_point
         return result
 
     def run(self):
@@ -132,26 +116,6 @@ class EcAffinePollardRhoDL:
 
 def main():
     pass
-    # curve_params = affine.CurveParams(
-    #     base_point=affine.CurveBasePoint(172235452673, 488838007757),
-    #     a=236367012452,
-    #     b=74315650609,
-    #     field_order=807368793739,
-    #     curve_order=807369655039,
-    # )
-    # params = generate_params(curve_params)
-    # print(f"Running for {curve_params}")
-    # instance = EcAffinePollardRhoDL(params)
-
-    # with timer.timeit("PollardRhoDL algorithm"):
-    #     x_found = instance.run()
-
-    # print(f"x_found: {x_found}")
-
-    # real = params.y
-    # restored = pow(params.g_prim, x_found, params.p)
-
-    # print(f"Real: g_prim^x = {real}, restored: g_prim^x_found {restored}")
 
 
 if __name__ == "__main__":
