@@ -28,8 +28,7 @@ def _in_s3(point: Point):
 
 
 class AbstractEcPollardRhoDL:
-    def _f(self, values: Tuple[Point, Coeffs]) -> Tuple[int, Coeffs]:
-        value, coeffs = values
+    def _step(self, value: Point, coeffs: Coeffs) -> Tuple[int, Coeffs]:
         if _in_s1(value):
             coeffs.alpha += 1
             coeffs.alpha %= self.curve_order
@@ -55,8 +54,8 @@ class AbstractEcPollardRhoDL:
 
         while True:
 
-            slow, slow_coeffs = self._f((slow, slow_coeffs))
-            fast, fast_coeffs = self._f(self._f((fast, fast_coeffs)))
+            slow, slow_coeffs = self._step(slow, slow_coeffs)
+            fast, fast_coeffs = self._step(*self._step(fast, fast_coeffs))
 
             if slow == fast:  # Slow meets fast.
                 break
