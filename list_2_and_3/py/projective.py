@@ -24,17 +24,6 @@ def set_curve_params(curve_params: CurveParams):
     ProjectivePoint._curve_params = curve_params
 
 
-def modinv(a, n):
-    b, c = 1, 0
-    while n:
-        q, r = divmod(a, n)
-        a, b, c, n = n, c, b - q * c, r
-    # at this point a is the gcd of the original inputs
-    if a == 1:
-        return b
-    raise ValueError(f"{a} is not invertible modulo {n}")
-
-
 class ProjectivePoint:
     _inf = None
     _base_point = None
@@ -84,7 +73,7 @@ class ProjectivePoint:
         if self.is_infinity():
             return AffinePoint.get_infinity()
         else:
-            div = self.z.reciprocal()
+            div = self.z.inverse()
             x = (self.x * div).value % self._curve_params.field_order
             y = (self.y * div).value % self._curve_params.field_order
             return AffinePoint(x, y)
@@ -240,5 +229,3 @@ if __name__ == "__main__":
     )
     field.set_modulus(field_order)
     set_curve_params(curve_params)
-
-    # TODO: (x1, 0, z1) + (k*x1,0,k*z1) => (x1,0,z1)

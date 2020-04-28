@@ -43,7 +43,7 @@ class FieldInt:
     def __rmul__(self, other):
         return self.__mul__(other)
 
-    def reciprocal(self):
+    def inverse(self):
         if self.value == 0:
             raise ValueError("Division by zero")
         # Extended Euclidean algorithm
