@@ -35,25 +35,18 @@ class ProjectivePoint:
         x: Optional[int] = None,
         y: Optional[int] = None,
         z: Optional[int] = None,
-        inf: Optional[bool] = False,
     ):
         if not self._curve_params:
             raise RuntimeError("Set ProjectivePoint curve params first.")
 
-        if not isinstance(x, FieldInt):
-            self.x = FieldInt(x) if x is not None else x
-        else:
-            self.x = x
+        if x is None:
+            # It is point at infinity.
+            self.x, self.y, self.z = None, 1, None
+            return
 
-        if not isinstance(y, FieldInt):
-            self.y = FieldInt(y) if y is not None else y
-        else:
-            self.y = y
-
-        if not isinstance(z, FieldInt):
-            self.z = FieldInt(z) if z is not None else z
-        else:
-            self.z = z
+        self.x = FieldInt(x) if not isinstance(x, FieldInt) else x
+        self.y = FieldInt(y) if not isinstance(y, FieldInt) else y
+        self.z = FieldInt(z) if not isinstance(z, FieldInt) else z
 
         # if self.y: # TODO: when?
         self.assert_on_curve()
