@@ -25,14 +25,14 @@ class Coeffs:
     beta: int = 0
 
 
-def generate_params(curve_params: affine.CurveParams) -> EcAffinePollardRhoDLParams:
+def generate_params(
+    curve_params: affine.CurveParams, value_to_find: int = None
+) -> EcAffinePollardRhoDLParams:
     base_point = affine.AffinePoint(
         curve_params.base_point.x, curve_params.base_point.y
     )
-
-    k = random.randint(2, curve_params.curve_order)
-
-    mul_result = k * base_point
+    value_to_find = value_to_find or random.randint(2, curve_params.curve_order)
+    mul_result = value_to_find * base_point
     return EcAffinePollardRhoDLParams(
         base_point=base_point,
         mul_point=mul_result,
@@ -47,3 +47,4 @@ class EcAffinePollardRhoDL(pollard_rho_base.AbstractEcPollardRhoDL):
         self.mul_point: affine.AffinePoint = params.mul_point
         self.field_order: int = params.field_order
         self.curve_order: int = params.curve_order
+

@@ -1,6 +1,7 @@
 import dataclasses
 import copy
 import math
+import itertools
 
 from typing import Tuple, Any
 
@@ -15,31 +16,28 @@ class Coeffs:
     beta: int = 0
 
 
-def _in_s1(value: Point):
-    return value.x % 3 == 1
-
-
-def _in_s2(value: Point):
-    return value.x % 3 == 0
-
-
-def _in_s3(value: Point):
-    return value.x % 3 == 2
-
-
 class AbstractEcPollardRhoDL:
+    def _in_s1(self, value: Point):
+        return value.x % 3 == 1
+
+    def _in_s2(self, value: Point):
+        return value.x % 3 == 0
+
+    def _in_s3(self, value: Point):
+        return value.x % 3 == 2
+
     def _step(self, value: Point, coeffs: Coeffs) -> Tuple[int, Coeffs]:
-        if _in_s1(value):
+        if self._in_s1(value):
             coeffs.alpha += 1
             coeffs.alpha %= self.curve_order
             return value + self.base_point, coeffs
-        elif _in_s2(value):
+        elif self._in_s2(value):
             coeffs.alpha *= 2
             coeffs.alpha %= self.curve_order
             coeffs.beta *= 2
             coeffs.beta %= self.curve_order
             return value * 2, coeffs
-        elif _in_s3(value):
+        elif self._in_s3(value):
             coeffs.beta += 1
             coeffs.beta %= self.curve_order
             return value + self.mul_point, coeffs

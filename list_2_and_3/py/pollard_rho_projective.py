@@ -20,14 +20,14 @@ class EcProjectivePollardRhoDLParams:
 
 
 def generate_params(
-    curve_params: projective.CurveParams,
+    curve_params: projective.CurveParams, value_to_find: int = None,
 ) -> EcProjectivePollardRhoDLParams:
     base_point = projective.ProjectivePoint(
         curve_params.base_point.x, curve_params.base_point.y, curve_params.base_point.z
     )
 
-    k = random.randint(2, curve_params.curve_order)
-    mul_result = k * base_point
+    value_to_find = value_to_find or random.randint(2, curve_params.curve_order)
+    mul_result = value_to_find * base_point
     return EcProjectivePollardRhoDLParams(
         base_point=base_point,
         mul_point=mul_result,
