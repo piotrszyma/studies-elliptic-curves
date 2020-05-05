@@ -51,6 +51,10 @@ class AffinePoint:
             + self._curve_params.b
         ), f"{self} not on curve."
 
+    @property
+    def affine(self):
+        return self
+
     def convert_to_projective_point(self):
         from projective import ProjectivePoint
 

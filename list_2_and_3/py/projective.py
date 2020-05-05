@@ -62,6 +62,10 @@ class ProjectivePoint:
             + self._curve_params.b * self.z * self.z * self.z
         ), f"{self} is not on curve."
 
+    @property
+    def affine(self):
+        return self.convert_to_affine_point()
+
     def convert_to_affine_point(self):
         if self.is_infinity():
             return AffinePoint.get_infinity()

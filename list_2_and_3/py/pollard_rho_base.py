@@ -18,13 +18,13 @@ class Coeffs:
 
 class AbstractEcPollardRhoDL:
     def _in_s1(self, value: Point):
-        return value.x % 3 == 1
+        return value.affine.x % 3 == 1
 
     def _in_s2(self, value: Point):
-        return value.x % 3 == 0
+        return value.affine.x % 3 == 0
 
     def _in_s3(self, value: Point):
-        return value.x % 3 == 2
+        return value.affine.x % 3 == 2
 
     def _step(self, value: Point, coeffs: Coeffs) -> Tuple[int, Coeffs]:
         if self._in_s1(value):
