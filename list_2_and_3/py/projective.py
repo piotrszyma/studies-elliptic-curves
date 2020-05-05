@@ -5,7 +5,7 @@ import random
 import copy
 import dataclasses
 from typing import Optional
-from field import FieldInt
+from field import FieldInt, MODULUS
 
 CurveBasePoint = collections.namedtuple("CurveBasePoint", "x y z")
 
@@ -30,10 +30,7 @@ class ProjectivePoint:
     __slots__ = ("x", "y", "z")
 
     def __init__(
-        self,
-        x: Optional[int] = None,
-        y: Optional[int] = None,
-        z: Optional[int] = None,
+        self, x: Optional[int] = None, y: Optional[int] = None, z: Optional[int] = None,
     ):
         if not self._curve_params:
             raise RuntimeError("Set ProjectivePoint curve params first.")
@@ -100,27 +97,86 @@ class ProjectivePoint:
         if not isinstance(value, FieldInt):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
 
-        a = FieldInt(self._curve_params.a)
+        a = self._curve_params.a
 
-        ZERO = FieldInt(0)
+        modulus = self._curve_params.field_order
+
         TWO = FieldInt(2)
+        ZERO = FieldInt(0)
         THREE = FieldInt(3)
 
         if value == TWO:
             if self.is_infinity() or self.y == ZERO:
                 return self.get_infinity()
 
-            y_two = self.y * TWO
-            t = self.x * self.x * THREE + a * self.z * self.z
-            u = self.z * y_two
-            v = u * self.x * y_two
-            w = t * t - v * TWO
+            _y_two = self.y * TWO
+            _t = self.x * self.x * THREE + FieldInt(a) * self.z * self.z
+            _u = self.z * _y_two
+            _v = _u * self.x * _y_two
+            _tt = _t * _t
+            _w = _tt - _v * TWO
 
-            uu = u * u
+            _uu = _u * _u
 
-            x2 = u * w
-            y2 = t * (v - w) - uu * self.y * self.y * TWO
-            z2 = uu * u
+            _x2 = _u * _w
+            _y2 = _t * (_v - _w) - _uu * self.y * self.y * TWO
+            _z2 = _uu * _u
+
+            y = self.y.value
+            x = self.x.value
+            z = self.z.value
+
+            y2 = (y * 2) % modulus
+            assert _y_two.value == y2
+
+            zz = (z * z) % modulus
+            assert zz == (self.z * self.z).value
+
+            xx = (x * x) % modulus
+            xx3 = (xx * 3) % modulus
+            assert xx3 == (self.x * self.x * THREE).value
+
+            xx3a = (xx3 + a) % modulus
+            assert xx3a == (self.x * self.x * THREE + FieldInt(a)).value
+            
+            zza = (zz * a) % modulus
+            t = (xx3a * zza) % modulus
+            assert _t.value == t
+
+            u = (z * y2) % modulus
+
+            assert _u.value == u
+
+            ux = u * x % modulus
+
+            v = ux * y2 % modulus
+
+            tt = (t * t) % modulus
+            assert _tt.value == tt
+
+            v2 = v * 2 % modulus
+
+            w = (tt - v2) % modulus
+            assert _w.value == w
+
+            uu = (u * u) % modulus
+
+            x2 = u * w % modulus
+
+            yy = y * y % modulus
+
+            v_w = (v - w) % modulus
+            uuyy = uu * yy % modulus
+            uuyy2 = uuyy * 2 % modulus
+
+            tv_w = t * v_w % modulus
+
+            y2 = (tv_w - uuyy2) % modulus
+
+            z2 = uu * u % modulus
+            assert _x2.value == x2
+            assert _y2.value == y2
+            assert _z2.value == z2
             return ProjectivePoint(x=x2, y=y2, z=z2)
 
         field_value = value
@@ -185,9 +241,7 @@ class ProjectivePoint:
     @classmethod
     def random(cls):
         base_point = ProjectivePoint(
-            cls.get_base_point().x,
-            cls.get_base_point().y,
-            cls.get_base_point().z
+            cls.get_base_point().x, cls.get_base_point().y, cls.get_base_point().z
         )
         random_value = FieldInt(random.randint(2, cls._curve_params.curve_order))
         return base_point * random_value
@@ -215,6 +269,7 @@ if __name__ == "__main__":
     import pdb
     import shared
     import field
+
     base_point = [605600, 205394, 1]
     a = 34328
     b = 354946
