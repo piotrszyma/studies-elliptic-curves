@@ -40,8 +40,8 @@ class AffinePoint:
         self.x = x
         self.y = y
 
-        if self.x is not None:
-            self.assert_on_curve()
+        # if self.x is not None:
+        #     self.assert_on_curve()
 
     def assert_on_curve(self):
         assert (
@@ -51,9 +51,8 @@ class AffinePoint:
             + self._curve_params.b
         ), f"{self} not on curve."
 
-    @property
-    def affine(self):
-        return self
+    def randomness(self):
+        return self.x
 
     def convert_to_projective_point(self):
         from projective import ProjectivePoint

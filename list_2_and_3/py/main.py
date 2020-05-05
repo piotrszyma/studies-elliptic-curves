@@ -81,6 +81,16 @@ if __name__ == "__main__":
     print(f"Running for {curve_params} and value_to_find={value_to_find}")
 
     if args.type == "affine":
+        import cProfile
+        pr = cProfile.Profile()
+        pr.enable()
         run_affine(curve_params, value_to_find)
+        pr.disable()
+        pr.print_stats()
     else:
+        import cProfile
+        pr = cProfile.Profile()
+        pr.enable()
         run_projective(curve_params, value_to_find)
+        pr.disable()
+        pr.print_stats()

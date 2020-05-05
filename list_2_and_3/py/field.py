@@ -2,10 +2,11 @@ import shared
 
 
 MODULUS = None
+INVERSE_CACHE = {}
 
 
 def set_modulus(modulus):
-    global MODULUS 
+    global MODULUS
     MODULUS = modulus
 
 
@@ -15,7 +16,7 @@ class FieldInt:
         
         if MODULUS is None:
             raise RuntimeError('First field.set_modulus(...)')
-        
+
         self.value = value % MODULUS
 
     def __add__(self, other):
@@ -46,9 +47,15 @@ class FieldInt:
         return self.__mul__(other)
 
     def inverse(self):
+        if self.value in INVERSE_CACHE:
+            return INVERSE_CACHE[self.value]
+
         if self.value == 0:
             raise ValueError("Division by zero")
-        return FieldInt(shared.modinv(self.value, MODULUS))
+
+        INVERSE_CACHE[self.value] = FieldInt(shared.modinv(self.value, MODULUS))
+
+        return INVERSE_CACHE[self.value]
 
     def __mod__(self, other):
         return self.value % other

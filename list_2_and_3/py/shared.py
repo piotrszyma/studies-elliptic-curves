@@ -1,6 +1,8 @@
 import dataclasses
+import functools
 
 
+@functools.lru_cache()
 def modinv(value: int, modulus: int) -> int:
     inverse, tmp = 1, 0
     while modulus:

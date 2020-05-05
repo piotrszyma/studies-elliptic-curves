@@ -3,7 +3,6 @@ from affine import AffinePoint
 import collections
 import random
 import copy
-import math
 import dataclasses
 from typing import Optional
 from field import FieldInt
@@ -49,7 +48,7 @@ class ProjectivePoint:
         self.z = FieldInt(z) if not isinstance(z, FieldInt) else z
 
         # if self.y: # TODO: when?
-        self.assert_on_curve()
+        # self.assert_on_curve()
 
     def assert_on_curve(self):
         if self.is_infinity():
@@ -62,17 +61,16 @@ class ProjectivePoint:
             + self._curve_params.b * self.z * self.z * self.z
         ), f"{self} is not on curve."
 
-    @property
-    def affine(self):
-        return self.convert_to_affine_point()
+    def randomness(self):
+        return (self.x * self.z.inverse()).value
 
     def convert_to_affine_point(self):
         if self.is_infinity():
             return AffinePoint.get_infinity()
         else:
             div = self.z.inverse()
-            x = (self.x * div).value % self._curve_params.field_order
-            y = (self.y * div).value % self._curve_params.field_order
+            x = (self.x * div).value
+            y = (self.y * div).value
             return AffinePoint(x, y)
 
     def __repr__(self):
@@ -102,22 +100,27 @@ class ProjectivePoint:
         if not isinstance(value, FieldInt):
             raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
 
-        two = FieldInt(2)
-        three = FieldInt(3)
         a = FieldInt(self._curve_params.a)
-        zero = FieldInt(0)
 
-        if value == two:
-            if self.is_infinity() or self.y == zero:
+        ZERO = FieldInt(0)
+        TWO = FieldInt(2)
+        THREE = FieldInt(3)
+
+        if value == TWO:
+            if self.is_infinity() or self.y == ZERO:
                 return self.get_infinity()
-            t = self.x * self.x * three + a * self.z * self.z
-            u = self.y * self.z * two
-            v = u * self.x * self.y * two
-            w = t * t - v * two
+
+            y_two = self.y * TWO
+            t = self.x * self.x * THREE + a * self.z * self.z
+            u = self.z * y_two
+            v = u * self.x * y_two
+            w = t * t - v * TWO
+
+            uu = u * u
 
             x2 = u * w
-            y2 = t * (v - w) - u * u * self.y * self.y * two
-            z2 = u * u * u
+            y2 = t * (v - w) - uu * self.y * self.y * TWO
+            z2 = uu * u
             return ProjectivePoint(x=x2, y=y2, z=z2)
 
         field_value = value
@@ -127,7 +130,7 @@ class ProjectivePoint:
         while field_value.value != 0:
             if field_value.value & 1 != 0:
                 result += temp
-            temp = temp * two
+            temp = temp * TWO
             field_value.value >>= 1
 
         return result

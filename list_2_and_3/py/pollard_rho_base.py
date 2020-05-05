@@ -1,6 +1,7 @@
 import dataclasses
 import copy
 import math
+import tqdm
 import itertools
 
 from typing import Tuple, Any
@@ -18,13 +19,13 @@ class Coeffs:
 
 class AbstractEcPollardRhoDL:
     def _in_s1(self, value: Point):
-        return value.affine.x % 3 == 1
+        return value.randomness() % 3 == 1
 
     def _in_s2(self, value: Point):
-        return value.affine.x % 3 == 0
+        return value.randomness() % 3 == 0
 
     def _in_s3(self, value: Point):
-        return value.affine.x % 3 == 2
+        return value.randomness() % 3 == 2
 
     def _step(self, value: Point, coeffs: Coeffs) -> Tuple[int, Coeffs]:
         if self._in_s1(value):
@@ -50,7 +51,7 @@ class AbstractEcPollardRhoDL:
         slow_coeffs = Coeffs(alpha=1, beta=0)
         fast_coeffs = Coeffs(alpha=1, beta=0)
 
-        while True:
+        for _ in itertools.count():
 
             slow, slow_coeffs = self._step(slow, slow_coeffs)
             fast, fast_coeffs = self._step(*self._step(fast, fast_coeffs))
