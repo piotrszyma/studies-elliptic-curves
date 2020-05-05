@@ -65,6 +65,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--type", choices=["affine", "projective"])
     parser.add_argument("--stdin", action="store_true", default=False)
+    parser.add_argument("--profiler", action="store_true", default=False)
     parser.add_argument("--path", type=str, default="sage_params.json")
     parser.add_argument("--value_to_find", type=int)
     args = parser.parse_args()
@@ -80,17 +81,16 @@ if __name__ == "__main__":
 
     print(f"Running for {curve_params} and value_to_find={value_to_find}")
 
+    if args.profiler:
+        import cProfile
+        pr = cProfile.Profile()
+        pr.enable()
+
     if args.type == "affine":
-        import cProfile
-        pr = cProfile.Profile()
-        pr.enable()
         run_affine(curve_params, value_to_find)
-        pr.disable()
-        pr.print_stats()
     else:
-        import cProfile
-        pr = cProfile.Profile()
-        pr.enable()
         run_projective(curve_params, value_to_find)
+
+    if args.profiler:
         pr.disable()
         pr.print_stats()

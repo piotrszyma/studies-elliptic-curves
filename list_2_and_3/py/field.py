@@ -11,6 +11,7 @@ def set_modulus(modulus):
 
 
 class FieldInt:
+    _instances = {}
 
     def __init__(self, value):
         
