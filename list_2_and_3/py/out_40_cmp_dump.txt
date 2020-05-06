@@ -1,0 +1,22 @@
+(venv) ➜  py git:(master) ✗ for i in `seq 10`; do python3 -O  main.py --type affine --path params_40.json --value_to_find=3 --time_only; done
+51.65
+51.28
+50.11
+50.19
+50.06
+50.23
+49.75
+49.83
+49.80
+49.52
+(venv) ➜  py git:(master) ✗ for i in `seq 10`; do python3 -O  main.py --type projective --path params_40.json --value_to_find=3 --time_only; done
+48.66
+48.89
+48.69
+48.51
+48.60
+48.93
+48.89
+48.88
+48.72
+48.72
