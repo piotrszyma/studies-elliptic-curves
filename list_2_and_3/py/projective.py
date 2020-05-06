@@ -101,63 +101,65 @@ class ProjectivePoint:
 
         modulus = self._curve_params.field_order
 
-        TWO = FieldInt(2)
-        ZERO = FieldInt(0)
-        THREE = FieldInt(3)
-
-        if value == TWO:
-            if self.is_infinity() or self.y == ZERO:
+        if value.value == 2:
+            if self.is_infinity() or self.y.value == 0:
                 return self.get_infinity()
 
-            _y_two = self.y * TWO
-            _t = self.x * self.x * THREE + FieldInt(a) * self.z * self.z
-            _u = self.z * _y_two
-            _v = _u * self.x * _y_two
-            _tt = _t * _t
-            _w = _tt - _v * TWO
+            # _y_two = self.y * TWO
+            # _xx = self.x * self.x
+            # _zza = self.z * self.z * FieldInt(a)
+            # _xx3 = _xx * THREE
+            # _t = _xx3 + _zza
+            # _u = self.z * _y_two
+            # _v = _u * self.x * _y_two
+            # _tt = _t * _t
+            # _w = _tt - _v * TWO
 
-            _uu = _u * _u
+            # _uu = _u * _u
 
-            _x2 = _u * _w
-            _y2 = _t * (_v - _w) - _uu * self.y * self.y * TWO
-            _z2 = _uu * _u
+            # _x2 = _u * _w
+            # _y2 = _t * (_v - _w) - _uu * self.y * self.y * TWO
+            # _z2 = _uu * _u
+            # return ProjectivePoint(x=_x2, y=_y2, z=_z2)
 
             y = self.y.value
             x = self.x.value
             z = self.z.value
 
             y2 = (y * 2) % modulus
-            assert _y_two.value == y2
+            # assert _y_two.value == y2
 
             zz = (z * z) % modulus
-            assert zz == (self.z * self.z).value
+            # assert zz == (self.z * self.z).value
 
             xx = (x * x) % modulus
-            xx3 = (xx * 3) % modulus
-            assert xx3 == (self.x * self.x * THREE).value
+            # assert xx == _xx.value
 
-            xx3a = (xx3 + a) % modulus
-            assert xx3a == (self.x * self.x * THREE + FieldInt(a)).value
-            
+            xx3 = (xx * 3) % modulus
+            # assert xx3 == (self.x * self.x * THREE).value
+
             zza = (zz * a) % modulus
-            t = (xx3a * zza) % modulus
-            assert _t.value == t
+
+            # assert zza == _zza.value
+
+            t = (xx3 + zza) % modulus
+            # assert _t.value == t
 
             u = (z * y2) % modulus
 
-            assert _u.value == u
+            # assert _u.value == u
 
             ux = u * x % modulus
 
             v = ux * y2 % modulus
 
             tt = (t * t) % modulus
-            assert _tt.value == tt
+            # assert _tt.value == tt
 
             v2 = v * 2 % modulus
 
             w = (tt - v2) % modulus
-            assert _w.value == w
+            # assert _w.value == w
 
             uu = (u * u) % modulus
 
@@ -174,11 +176,12 @@ class ProjectivePoint:
             y2 = (tv_w - uuyy2) % modulus
 
             z2 = uu * u % modulus
-            assert _x2.value == x2
-            assert _y2.value == y2
-            assert _z2.value == z2
+            # assert _x2.value == x2
+            # assert _y2.value == y2
+            # assert _z2.value == z2
             return ProjectivePoint(x=x2, y=y2, z=z2)
 
+        TWO = FieldInt(2)
         field_value = value
         temp = copy.deepcopy(self)
         result = ProjectivePoint.get_infinity()
