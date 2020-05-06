@@ -32,20 +32,20 @@ class ProjectivePoint:
     def __init__(
         self, x: Optional[int] = None, y: Optional[int] = None, z: Optional[int] = None,
     ):
-        if not self._curve_params:
+        if __debug__ and not self._curve_params:
             raise RuntimeError("Set ProjectivePoint curve params first.")
 
         if x is None:
             # It is point at infinity.
-            self.x, self.y, self.z = None, 1, None
+            self.x, self.y, self.z = None, FieldInt(1), None
             return
 
-        self.x = FieldInt(x) if not isinstance(x, FieldInt) else x
-        self.y = FieldInt(y) if not isinstance(y, FieldInt) else y
-        self.z = FieldInt(z) if not isinstance(z, FieldInt) else z
+        self.x = FieldInt(x)
+        self.y = FieldInt(y)
+        self.z = FieldInt(z)
 
-        # if self.y: # TODO: when?
-        # self.assert_on_curve()
+        if __debug__:
+            self.assert_on_curve()
 
     def assert_on_curve(self):
         if self.is_infinity():
@@ -207,10 +207,23 @@ class ProjectivePoint:
         if other.is_infinity():
             return self
 
-        t0 = self.y * other.z
-        t1 = other.y * self.z
-        u0 = self.x * other.z
-        u1 = other.x * self.z
+        modulus = self._curve_params.field_order
+
+        t0 = (self.y.value * other.z.value) % modulus
+        # _t0 = self.y * other.z
+        # assert t0 == _t0.value
+
+        t1 = other.y.value * self.z.value % modulus
+        # _t1 = other.y * self.z
+        # assert t1 == _t1.value
+
+        u0 = self.x.value * other.z.value % modulus
+        # _u0 = self.x * other.z
+        # assert _u0.value == u0
+
+        u1 = other.x.value * self.z.value % modulus
+        # _u1 = other.x * self.z
+        # assert _u1.value == u1
 
         if u0 == u1:
             if t0 == t1:
@@ -218,17 +231,77 @@ class ProjectivePoint:
             else:
                 return ProjectivePoint.get_infinity()
         else:
-            t = t0 - t1
-            u = u0 - u1
-            u2 = u * u
-            v = self.z * other.z
-            w = t * t * v - u2 * (u0 + u1)
-            u3 = u * u2
-            x_ = u * w
-            y_ = t * (u0 * u2 - w) - t0 * u3
-            z_ = u3 * v
-            # print(f"t: {t}, u: {u}, u2: {u2}, v: {v}, w: {w}, u3: {u3}, x_: {x_}, y_:{y_}, z: {z_}")
-        return ProjectivePoint(x=x_, y=y_, z=z_)
+
+            s_z = self.z.value
+            # _s_z = self.z
+
+            o_z = other.z.value
+            # _o_z = other.z
+
+            t = (t0 - t1) % modulus
+            # _t = _t0 - _t1
+            # assert _t.value == t
+
+            u0m1 = (u0 - u1) % modulus
+            # _u0m1 = _u0 - _u1
+            # assert _u0m1.value == u0m1
+
+            u0p1 = (u0 + u1) % modulus
+            # _u0p1 = _u0 + _u1
+            # assert _u0p1.value == u0p1
+
+            u2 = u0m1 * u0m1 % modulus
+            # _u2 = _u0m1 * _u0m1
+            # assert _u2.value == u2
+
+            v = s_z * o_z % modulus
+            # _v = _s_z * _o_z
+            # assert _v.value == v
+
+            tt = t * t % modulus
+            # _tt = _t * _t
+            # assert _tt.value == tt
+
+            ttv = tt * v % modulus
+            # _ttv = _tt * _v
+            # assert _ttv.value == ttv
+
+            u2_u0p1 = u2 * u0p1 % modulus
+            # _u2_u0p1 = _u2 * (_u0p1)
+            # assert _u2_u0p1.value == u2_u0p1
+
+            w = (ttv - u2_u0p1) % modulus
+            # _w = _ttv - _u2_u0p1
+            # assert _w.value == w
+
+            u3 = u0m1 * u2 % modulus
+            # _u3 = _u0m1 * _u2
+
+            x = u0m1 * w
+            # x_ = _u0m1 * _w
+
+            u0_u2 = u0 * u2 % modulus
+            # _u0_u2 = _u0 * _u2
+
+            u0_u2_m_w = (u0_u2 - w) % modulus
+            # _u0_u2_m_w = _u0_u2 - _w
+            # assert _u0_u2_m_w.value == u0_u2_m_w
+
+            # _t_u0_u2_m_w = _t * _u0_u2_m_w
+            t_u0_u2_m_w = t * u0_u2_m_w
+
+            # _t0_u3 = _t0 * _u3
+            t0_u3 = t0 * u3 % modulus
+
+            y = (t_u0_u2_m_w - t0_u3) % modulus
+            # y_ = _t_u0_u2_m_w - _t0_u3
+            # assert y_.value == y
+
+            z = u3 * v % modulus
+            # z_ = _u3 * _v
+            # assert z_.value == z
+
+        return ProjectivePoint(x=x, y=y, z=z)
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -236,7 +309,7 @@ class ProjectivePoint:
     def __neg__(self):
         if self.is_infinity():
             return self
-        return ProjectivePoint(x=self.x, y=-self.y, z=self.z)
+        return ProjectivePoint(x=self.x.value, y=-self.y.value, z=self.z.value)
 
     def is_infinity(self):
         return self.x is None and self.z is None
