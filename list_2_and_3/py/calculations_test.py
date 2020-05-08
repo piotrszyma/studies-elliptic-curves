@@ -106,20 +106,21 @@ if __name__ == "__main__":
                 base_point = AffinePoint.get_base_point()
 
             avg_mul, std_mul = test_multiplication(base_point, representation)
-            # avg_add, std_add = test_addition(base_point, representation)
+            avg_add, std_add = test_addition(base_point, representation)
             avg_double, std_double = test_doubling(base_point, representation)
 
             results[representation][str(bit_length)] = {
                 "avg_mul": avg_mul,
                 "std_mul": std_mul,
-                # "avg_add": avg_add,
-                # "std_add": std_add,
+                "avg_add": avg_add,
+                "std_add": std_add,
                 "avg_double": avg_double,
                 "std_double": std_double,
             }
-    import pdb
 
+    with open('calculations_benchmark.json', 'w') as fp:
+        json.dump(results, fp)
+    
+    print(results)
+    import pdb
     pdb.set_trace()
-    # # base_point = ProjectivePoint(172235452673, 488838007757, 1)
-    # # # start = time()
-    # # # duration = time() - start/
