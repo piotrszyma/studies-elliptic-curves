@@ -41,7 +41,7 @@ def test_multiplication(basepoint):
         scalar = ProjectivePoint.get_random_number()
 
         start = time()
-        result = scalar * point
+        result = point * scalar.value
         durations.append(time() - start)
 
     durations = np.array(durations)
@@ -59,7 +59,7 @@ def test_addition(basepoint):
 
         scalar = ProjectivePoint.get_random_number()
         start = time()
-        result = scalar + point
+        result = point * scalar.value
         durations.append(time() - start)
 
     durations = np.array(durations)
@@ -76,7 +76,7 @@ def test_doubling(basepoint):
             point = AffinePoint.random()
         scalar = ProjectivePoint.get_random_number()
         start = time()
-        result = scalar * 2
+        result = point * scalar.value 
         durations.append(time() - start)
 
     durations = np.array(durations)
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     results = {}
 
     for bit_length in bit_lengths:
-        with open(f"params_{bit_length}.json", 'r') as f:
+        with open(f"params_{bit_length}.json", "r") as f:
             data = json.load(f)
         curve_params = create_curve_params(data)
         base_point = ProjectivePoint.get_base_point()
@@ -103,7 +103,11 @@ if __name__ == "__main__":
             "avg_add": avg_add,
             "std_add": std_add,
             "avg_double": avg_double,
-            "std_double": std_double
+            "std_double": std_double,
         }
         import pdb
+
         pdb.set_trace()
+    # # base_point = ProjectivePoint(172235452673, 488838007757, 1)
+    # # # start = time()
+    # # # duration = time() - start/
