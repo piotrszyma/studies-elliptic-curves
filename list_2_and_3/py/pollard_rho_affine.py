@@ -47,4 +47,3 @@ class EcAffinePollardRhoDL(pollard_rho_base.AbstractEcPollardRhoDL):
         self.mul_point: affine.AffinePoint = params.mul_point
         self.field_order: int = params.field_order
         self.curve_order: int = params.curve_order
-

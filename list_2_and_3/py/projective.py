@@ -59,7 +59,10 @@ class ProjectivePoint:
         ), f"{self} is not on curve."
 
     def randomness(self):
-        return (self.x * self.z.inverse()).value
+        return (self.x * self.z).value
+
+    def coords(self):
+        return [self.x.value, self.y.value, self.z.value]
 
     def convert_to_affine_point(self):
         if self.is_infinity():

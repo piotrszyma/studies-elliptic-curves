@@ -1,0 +1,71 @@
+Running for CurveParams(base_point=CurveBasePoint(x=672566, y=449900, z=1), a=714855, b=392766, curve_order=748387, field_order=749149) and value_to_find=3
+Executed PollardRhoDL algorithm on projective coordinates., it took 10.94 s.
+x_found * base_point = ProjectivePoint(439777, 89180, 76587), mul_real = ProjectivePoint(439777, 89180, 76587)
+Successfully found point!
+         20469534 function calls (20469418 primitive calls) in 10.941 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.000    0.000 <string>:2(__init__)
+        1    0.000    0.000    0.000    0.000 contextlib.py:107(__enter__)
+        1    0.000    0.000    0.000    0.000 contextlib.py:116(__exit__)
+        1    0.000    0.000    0.000    0.000 contextlib.py:237(helper)
+        1    0.000    0.000    0.000    0.000 contextlib.py:81(__init__)
+     92/4    0.000    0.000    0.001    0.000 copy.py:132(deepcopy)
+       56    0.000    0.000    0.000    0.000 copy.py:190(_deepcopy_atomic)
+        4    0.000    0.000    0.000    0.000 copy.py:220(_deepcopy_tuple)
+        4    0.000    0.000    0.000    0.000 copy.py:221(<listcomp>)
+     16/4    0.000    0.000    0.000    0.000 copy.py:237(_deepcopy_dict)
+       36    0.000    0.000    0.000    0.000 copy.py:253(_keep_alive)
+     16/4    0.000    0.000    0.001    0.000 copy.py:269(_reconstruct)
+       32    0.000    0.000    0.000    0.000 copy.py:274(<genexpr>)
+       16    0.000    0.000    0.000    0.000 copyreg.py:87(__newobj__)
+        2    0.000    0.000    0.000    0.000 copyreg.py:96(_slotnames)
+  4723638    1.215    0.000    1.215    0.000 field.py:16(__init__)
+  2099452    1.616    0.000    2.623    0.000 field.py:40(__mul__)
+   262386    0.129    0.000    0.180    0.000 field.py:68(__eq__)
+        6    0.000    0.000    0.000    0.000 field.py:78(__str__)
+        1    0.000    0.000    0.000    0.000 main.py:41(_print_results)
+        1    0.000    0.000   10.941   10.941 main.py:59(run_projective)
+   787152    0.276    0.000    1.623    0.000 pollard_rho_base.py:21(_in_s1)
+   525116    0.178    0.000    1.031    0.000 pollard_rho_base.py:24(_in_s2)
+   262412    0.088    0.000    0.508    0.000 pollard_rho_base.py:27(_in_s3)
+   787152    1.134    0.000    9.216    0.000 pollard_rho_base.py:30(_step)
+        1    0.454    0.454   10.940   10.940 pollard_rho_base.py:48(_walk)
+        1    0.000    0.000   10.940   10.940 pollard_rho_base.py:75(run)
+        1    0.000    0.000    0.000    0.000 pollard_rho_projective.py:22(generate_params)
+        1    0.000    0.000    0.000    0.000 pollard_rho_projective.py:40(__init__)
+        2    0.000    0.000    0.000    0.000 projective.py:200(__rmul__)
+   524452    2.097    0.000    3.225    0.000 projective.py:203(__add__)
+  1573996    0.223    0.000    0.223    0.000 projective.py:317(is_infinity)
+   787160    0.818    0.000    1.397    0.000 projective.py:32(__init__)
+        2    0.000    0.000    0.000    0.000 projective.py:332(get_infinity)
+  1574680    0.656    0.000    2.620    0.000 projective.py:61(randomness)
+        2    0.000    0.000    0.000    0.000 projective.py:76(__repr__)
+   262384    0.368    0.000    1.270    0.000 projective.py:81(__eq__)
+     262710/262706    1.092    0.000    1.696    0.000 projective.py:96(__mul__)
+        1    0.000    0.000    0.000    0.000 shared.py:5(modinv)
+        2    0.000    0.000    0.000    0.000 timer.py:5(timeit)
+       16    0.000    0.000    0.000    0.000 {built-in method __new__ of type object at 0x1094a1ae0}
+       16    0.000    0.000    0.000    0.000 {built-in method builtins.divmod}
+       33    0.000    0.000    0.000    0.000 {built-in method builtins.getattr}
+       18    0.000    0.000    0.000    0.000 {built-in method builtins.hasattr}
+      168    0.000    0.000    0.000    0.000 {built-in method builtins.id}
+  6035965    0.597    0.000    0.597    0.000 {built-in method builtins.isinstance}
+       16    0.000    0.000    0.000    0.000 {built-in method builtins.issubclass}
+        4    0.000    0.000    0.000    0.000 {built-in method builtins.len}
+        2    0.000    0.000    0.000    0.000 {built-in method builtins.next}
+        3    0.000    0.000    0.000    0.000 {built-in method builtins.print}
+       12    0.000    0.000    0.000    0.000 {built-in method builtins.setattr}
+        2    0.000    0.000    0.000    0.000 {built-in method time.time}
+       16    0.000    0.000    0.000    0.000 {method '__reduce_ex__' of 'object' objects}
+       35    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+      200    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
+        2    0.000    0.000    0.000    0.000 {method 'get' of 'mappingproxy' objects}
+       20    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
+        3    0.000    0.000    0.000    0.000 {method 'startswith' of 'str' objects}
+       12    0.000    0.000    0.000    0.000 {method 'update' of 'dict' objects}
+
+

@@ -54,6 +54,9 @@ class AffinePoint:
     def randomness(self):
         return self.x
 
+    def coords(self):
+        return [self.x.value, self.y.value]
+
     def convert_to_projective_point(self):
         from projective import ProjectivePoint
 

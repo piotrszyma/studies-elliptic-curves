@@ -27,18 +27,21 @@ class AbstractEcPollardRhoDL:
     def _in_s3(self, value: Point):
         return value.randomness() % 3 == 2
 
-    def _step(self, value: Point, coeffs: Coeffs) -> Tuple[int, Coeffs]:
+    def _step(self, value: Point, coeffs: Coeffs, type_: str = None) -> Tuple[int, Coeffs]:
         if self._in_s1(value):
+            print(type_, 's1')
             coeffs.alpha += 1
             coeffs.alpha %= self.curve_order
             return value + self.base_point, coeffs
         elif self._in_s2(value):
+            print(type_, 's2')
             coeffs.alpha *= 2
             coeffs.alpha %= self.curve_order
             coeffs.beta *= 2
             coeffs.beta %= self.curve_order
             return value * 2, coeffs
         elif self._in_s3(value):
+            print(type_, 's3')
             coeffs.beta += 1
             coeffs.beta %= self.curve_order
             return value + self.mul_point, coeffs
@@ -53,8 +56,8 @@ class AbstractEcPollardRhoDL:
 
         for _ in itertools.count():
 
-            slow, slow_coeffs = self._step(slow, slow_coeffs)
-            fast, fast_coeffs = self._step(*self._step(fast, fast_coeffs))
+            slow, slow_coeffs = self._step(slow, slow_coeffs, 's')
+            fast, fast_coeffs = self._step(*self._step(fast, fast_coeffs, 'f'), 'f')
 
             if slow == fast:  # Slow meets fast.
                 break
