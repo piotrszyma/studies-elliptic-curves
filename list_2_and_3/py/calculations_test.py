@@ -59,7 +59,7 @@ def test_addition(basepoint):
 
         scalar = ProjectivePoint.get_random_number()
         start = time()
-        result = scalar * point
+        result = scalar + point
         durations.append(time() - start)
 
     durations = np.array(durations)
@@ -76,7 +76,7 @@ def test_doubling(basepoint):
             point = AffinePoint.random()
         scalar = ProjectivePoint.get_random_number()
         start = time()
-        result = scalar * point
+        result = scalar * 2
         durations.append(time() - start)
 
     durations = np.array(durations)
@@ -107,6 +107,3 @@ if __name__ == "__main__":
         }
         import pdb
         pdb.set_trace()
-    # # base_point = ProjectivePoint(172235452673, 488838007757, 1)
-    # # # start = time()
-    # # # duration = time() - start/
