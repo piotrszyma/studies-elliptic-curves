@@ -56,15 +56,15 @@ def test_addition(basepoint, representation):
     durations = []
     for _ in range(NUMBER_OF_TRIES):
         if representation == "projective":
-            point = ProjectivePoint.random()
-            scalar = ProjectivePoint.get_random_number()
+            point_1 = ProjectivePoint.random()
+            point_2 = ProjectivePoint.random()
         else:
-            point = AffinePoint.random()
-            scalar = AffinePoint.get_random_number()
+            point_1 = AffinePoint.random()
+            point_2 = ProjectivePoint.random()
 
         start = time()
-        import pdb; pdb.set_trace()
-        result = point + scalar
+        # import pdb; pdb.set_trace()
+        result = point_1 + point_2
         durations.append(time() - start)
 
     durations = np.array(durations)
