@@ -122,12 +122,3 @@ if __name__ == "__main__":
     # # base_point = ProjectivePoint(172235452673, 488838007757, 1)
     # # # start = time()
     # # # duration = time() - start/
-s1s1	132
-s1s2	131
-s1s3	159
-s2s1	137
-s2s2	132
-s2s3	140
-s3s1	154
-s3s2	146
-s3s3	164
