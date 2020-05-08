@@ -151,6 +151,7 @@ class AffinePoint:
 
     @classmethod
     def get_base_point(cls):
+        import pdb; pdb.set_trace()
         if cls._base_point:
             return cls._base_point
         cls._base_point = cls(*cls._curve_params.base_point)
