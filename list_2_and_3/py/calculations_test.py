@@ -60,7 +60,7 @@ def test_addition(basepoint, representation):
             point_2 = ProjectivePoint.random()
         else:
             point_1 = AffinePoint.random()
-            point_2 = ProjectivePoint.random()
+            point_2 = AffinePoint.random()
 
         start = time()
         # import pdb; pdb.set_trace()
