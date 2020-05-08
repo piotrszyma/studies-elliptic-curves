@@ -32,11 +32,11 @@ def create_curve_params(raw_json):
     return curve_params
 
 
-def test_multiplication(basepoint):
+def test_multiplication(basepoint, representation):
 
     durations = []
     for _ in range(NUMBER_OF_TRIES):
-        if isinstance(basepoint, ProjectivePoint):
+        if representation == "projective":
             point = ProjectivePoint.random()
             scalar = ProjectivePoint.get_random_number()
         else:
@@ -51,11 +51,11 @@ def test_multiplication(basepoint):
     return durations.mean(), durations.std()
 
 
-def test_addition(basepoint):
+def test_addition(basepoint, representation):
 
     durations = []
     for _ in range(NUMBER_OF_TRIES):
-        if isinstance(basepoint, ProjectivePoint):
+        if representation == "projective":
             point = ProjectivePoint.random()
             scalar = ProjectivePoint.get_random_number()
         else:
@@ -64,18 +64,18 @@ def test_addition(basepoint):
 
         start = time()
         import pdb; pdb.set_trace()
-        result = point + scalar.value
+        result = point + scalar
         durations.append(time() - start)
 
     durations = np.array(durations)
     return durations.mean(), durations.std()
 
 
-def test_doubling(basepoint):
+def test_doubling(basepoint, representation):
 
     durations = []
     for _ in range(NUMBER_OF_TRIES):
-        if isinstance(basepoint, ProjectivePoint):
+        if representation == "projective":
             point = ProjectivePoint.random()
         else:
             point = AffinePoint.random()
@@ -104,9 +104,9 @@ if __name__ == "__main__":
             else: 
                 base_point = AffinePoint.get_base_point()
 
-            avg_mul, std_mul = test_multiplication(base_point)
-            # avg_add, std_add = test_addition(base_point)
-            avg_double, std_double = test_doubling(base_point)
+            avg_mul, std_mul = test_multiplication(base_point, representation)
+            avg_add, std_add = test_addition(base_point, representation)
+            avg_double, std_double = test_doubling(base_point, representation)
 
             results[representation][str(bit_length)] = {
                 "avg_mul": avg_mul,
