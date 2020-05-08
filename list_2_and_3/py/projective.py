@@ -338,8 +338,8 @@ class ProjectivePoint:
 
     @classmethod
     def get_base_point(cls):
-        if cls._base_point:
-            return cls._base_point
+        # if cls._base_point:
+            # return cls._base_point
         cls._base_point = cls._curve_params.base_point
         return cls._base_point
 
