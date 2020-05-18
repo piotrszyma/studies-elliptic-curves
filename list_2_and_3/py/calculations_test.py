@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import decimal 
 
 from field import FieldInt
 from time import time
@@ -95,7 +96,6 @@ if __name__ == "__main__":
         results[representation] = {}
 
         for bit_length in bit_lengths:
-            print("1")
             with open(f"params_{bit_length}.json", "r") as f:
                 data = json.load(f)
             curve_params = create_curve_params(data)
@@ -109,18 +109,13 @@ if __name__ == "__main__":
             avg_add, std_add = test_addition(base_point, representation)
             avg_double, std_double = test_doubling(base_point, representation)
 
-            results[representation][str(bit_length)] = {
-                "avg_mul": avg_mul,
-                "std_mul": std_mul,
-                "avg_add": avg_add,
-                "std_add": std_add,
-                "avg_double": avg_double,
-                "std_double": std_double,
-            }
+
+            print(
+                f'{representation} {bit_length}',
+                f"{avg_mul:.5E}",
+                f"{avg_add:.5E}"
+                f"{avg_double:.5E}"
+            )
 
     with open('calculations_benchmark.json', 'w') as fp:
         json.dump(results, fp)
-    
-    print(results)
-    import pdb
-    pdb.set_trace()
