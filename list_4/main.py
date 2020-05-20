@@ -39,11 +39,20 @@ def main():
     chunks = [*split(R, u)]
     chunks_of_chunks = [[*split(chunk, v)] for chunk in chunks]
 
-
-
     # First subdivide R into h blocks R_i of size a = math.ceil(n / h)
     import pdb; pdb.set_trace()
 
+    # TODO: calculate g_0, g_1, ..., g_h
+
+    two_to_a = 2 ** a
+
+    g_list = [g] 
+    for _ in range(1, h):
+      g_list.append(g_list[-1] ** two_to_a)
+
+    assert len(g_list) == h
+
+    
 
 if __name__ == "__main__":
     main()
