@@ -3,12 +3,16 @@ import json
 import argparse
 import os
 import math
+import functools
+from typing import List
 
 sys.path.append("../list_2_and_3/py")
 
 import affine
 import field
 import shared
+
+AffinePoint = affine.AffinePoint
 
 
 def _read_sage_params_from_file(file_path):
@@ -71,6 +75,7 @@ def main():
     _set_curve_params(args)
     u = args.u  # in the paper denoted as "h"
     v = args.v  # in the paper denoted as "v"
+    h = u
 
     # Take some g and R, we want to compute g ^ R
     g = affine.AffinePoint.random()
@@ -83,20 +88,28 @@ def main():
     chunks_of_chunks = [[*split(chunk, v)] for chunk in chunks]
 
     # First subdivide R into h blocks R_i of size a = math.ceil(n / h)
+    two_to_a = 2 ** a
+
+    g_list: List[AffinePoint] = [g]
+    for _ in range(1, u):
+        g_list.append(g_list[-1] * two_to_a)
+
+    assert len(g_list) == u
+
+    print(f"g_list = {g_list}")
+
+    G = []
+
+    # Calculate G[0][u] for 0 < u < 2**h
+    for u in range(1, 2 ** h):
+        bin_ids = map(int, bin(u)[2:].zfill(h))
+        gs_to_consider = [g_el for g_el, power in zip(g_list, bin_ids) if power == 1]
+        G.append(functools.reduce(lambda prev, curr: prev + curr, gs_to_consider))
+
+    # TODO: Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
     import pdb
 
     pdb.set_trace()
-
-    # TODO: calculate g_0, g_1, ..., g_h
-
-    two_to_a = 2 ** a
-
-    g_list = [g]
-    for i in range(1, u):
-        g_list.append(g_list[-1] ** two_to_a)
-        print(i)
-
-    assert len(g_list) == u
 
 
 if __name__ == "__main__":
