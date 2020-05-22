@@ -1,3 +1,6 @@
+import affine
+import field
+import shared
 import pdb
 import sys
 import json
@@ -9,9 +12,6 @@ from typing import List
 
 sys.path.append("../list_2_and_3/py")
 
-import shared
-import field
-import affine
 
 AffinePoint = affine.AffinePoint
 
@@ -63,10 +63,12 @@ def split(num, n_chunks):
       # of chunks = 3 then as # of bits in X is 12 then yields [0b1101, 0b0101, 0b1010]
     """
     num_bits = math.ceil(math.log(num, 2))
-    chunk_bits_size = math.ceil(num_bits / n_chunks)
+    # num_bits = len(num)
+    # chunk_bits_size = math.ceil(num_bits / n_chunks)
 
     mask = int("1" * chunk_bits_size, base=2)
     while num:
+        # yield bin(num & mask)[2:]
         yield num & mask
         num >>= chunk_bits_size
 
@@ -108,27 +110,26 @@ def main():
         gs_to_consider = [r_i for r_i, u_i in zip(g_list, bin_ids) if u_i == 1]
         G[0].append(functools.reduce(lambda prev, curr: prev + curr, gs_to_consider))
 
-    # TODO: Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
+    # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
     for j in range(0, v):
         # exponent = field.FieldInt(2) * (field.FieldInt(j) * b_field_int)
         exponent = 2 ** (j * b)
         exponent %= field.MODULUS
-        G[j] =  [G[0][u] * exponent for u in range((2**h)-2)]
+        G[j] = [G[0][u] * exponent for u in range((2**h)-2)]
 
-    import pdb; pdb.set_trace()
     # Exponentation
-    R = 1
+    R_output = 1
     for k in range(b-1, 0, -1):
-        R = R ** 2
+        R_output = R_output ** 2
         for j in range(v-1, 0, -1):
             # compute I_j_k
-            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h-1)] # 10101010100101
+            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h-1)]
             I_j_k = 0
             for i in range(h-1):
-                I_j_k += int(e_i_j_k_list[i]) * (2 ** i) # e_i_j_k_list[i] to 0/1 
-            R = R * G[j][I_j_k]
+                # e_i_j_k_list[i] ais either 0 or 1
+                I_j_k += int(e_i_j_k_list[i]) * (2 ** i)
+            R_output = R_output * G[j][I_j_k]
 
-    
 
 if __name__ == "__main__":
     main()
