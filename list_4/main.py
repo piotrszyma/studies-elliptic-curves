@@ -150,6 +150,10 @@ def main():
         R_output = R_output * 2
         for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
             I_j_k = sum(e[i][j][k] * (2 ** i) for i in range(h))
+
+            if I_j_k == 0:
+                print('Warning, I_j_k returned 0...')
+                continue
             R_output = R_output + G[j][I_j_k]
 
     R_real = g * R.value
