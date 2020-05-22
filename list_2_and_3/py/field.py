@@ -52,11 +52,18 @@ class FieldInt:
     def __float__(self):
         return float(self.value)
 
+    def __index__(self):
+        return self.value
+
     def __and__(self, other):
         return self.value & other
         
     def __rshift__(self, other):
         self.value >>= other
+        return self
+
+    def __bool__(self):
+        return bool(self.value)
 
     @classmethod
     def random(cls, min_value=0, max_value=1):

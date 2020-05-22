@@ -1,19 +1,29 @@
-import affine
-import field
-import shared
 import pdb
 import sys
 import json
 import argparse
 import os
 import math
+import random
 import functools
 from typing import List
 
 sys.path.append("../list_2_and_3/py")
 
+import affine
+import field
+import shared
 
 AffinePoint = affine.AffinePoint
+FieldInt = field.FieldInt
+
+
+class IntWithBinIndex(int):
+    def __getitem__(self, value):
+        try:
+            return bin(self)[2:][value]
+        except IndexError:
+            return 0
 
 
 def _read_sage_params_from_file(file_path):
@@ -62,14 +72,13 @@ def split(num, n_chunks):
       if the number is X = 1101 0101 1010 
       # of chunks = 3 then as # of bits in X is 12 then yields [0b1101, 0b0101, 0b1010]
     """
-    num_bits = math.ceil(math.log(num, 2))
+    num_bits = len(bin(num)[2:])
     # num_bits = len(num)
-    # chunk_bits_size = math.ceil(num_bits / n_chunks)
-
+    chunk_bits_size = math.ceil(num_bits / n_chunks)
     mask = int("1" * chunk_bits_size, base=2)
     while num:
         # yield bin(num & mask)[2:]
-        yield num & mask
+        yield IntWithBinIndex(num & mask)
         num >>= chunk_bits_size
 
 
@@ -80,9 +89,13 @@ def main():
     v = args.v  # in the paper denoted as "v"
     h = u
 
+    random.seed(0)  # For repeated randomness.
+
     # Take some g and R, we want to compute g ^ R
     g = affine.AffinePoint.random()
+    # g = AffinePoint(336972847628, 312067054078)
     R = affine.AffinePoint.get_random_scalar()
+    # R = FieldInt(value=1150191622)
 
     l = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     a = math.ceil(l / h)  # Number of bits in single slice.
@@ -113,19 +126,19 @@ def main():
     # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
     for j in range(0, v):
         # exponent = field.FieldInt(2) * (field.FieldInt(j) * b_field_int)
-        exponent = 2 ** (j * b)
-        exponent %= field.MODULUS
-        G[j] = [G[0][u] * exponent for u in range((2**h)-2)]
+        exponent = pow(2, (j * b), field.MODULUS)
+        G[j] = [G[0][u] * exponent for u in range((2 ** h) - 2)]
 
     # Exponentation
     R_output = 1
-    for k in range(b-1, 0, -1):
+    for k in range(b - 1, 0, -1):
         R_output = R_output ** 2
-        for j in range(v-1, 0, -1):
+        for j in range(v - 1, 0, -1):
             # compute I_j_k
-            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h-1)]
+            assert len(chunks_of_chunks) == h - 1
+            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h - 1)]
             I_j_k = 0
-            for i in range(h-1):
+            for i in range(h - 1):
                 # e_i_j_k_list[i] ais either 0 or 1
                 I_j_k += int(e_i_j_k_list[i]) * (2 ** i)
             R_output = R_output * G[j][I_j_k]
