@@ -116,7 +116,19 @@ def main():
         G[j] =  [G[0][u] * exponent for u in range((2**h)-2)]
 
     import pdb; pdb.set_trace()
+    # Exponentation
+    R = 1
+    for k in range(b-1, 0, -1):
+        R = R ** 2
+        for j in range(v-1, 0, -1):
+            # compute I_j_k
+            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h-1)] # 10101010100101
+            I_j_k = 0
+            for i in range(h-1):
+                I_j_k += int(e_i_j_k_list[i]) * (2 ** i) # e_i_j_k_list[i] to 0/1 
+            R = R * G[j][I_j_k]
 
+    
 
 if __name__ == "__main__":
     main()
