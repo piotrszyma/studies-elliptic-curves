@@ -22,7 +22,7 @@ FieldInt = field.FieldInt
 class IntWithBinIndex(int):
     def __getitem__(self, value):
         try:
-            return bin(self)[2:][value]
+            return int(bin(self)[2:][value])
         except IndexError:
             return 0
 
@@ -125,32 +125,31 @@ def main():
 
     assert len(g_list) == u
 
-    G = [[] for _ in range(v)]
-
+    G = {idx: {} for idx in range(v)}
     # Calculate G[0][u] for 0 < u < 2**h
-    for u in range(1, 2 ** h):
+    for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
         bin_ids = map(int, bin(u)[2:].zfill(h))
         gs_to_consider = [r_i for r_i, u_i in zip(g_list, bin_ids) if u_i == 1]
-        G[0].append(functools.reduce(lambda prev, curr: prev + curr, gs_to_consider))
+        G[0][u] = functools.reduce(lambda prev, curr: prev + curr, gs_to_consider)
+
+    assert len(G[0]) == len(range(1, 2 ** h))
 
     # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
-    for j in range(0, v):
+    for j in range(1, v):
         # exponent = field.FieldInt(2) * (field.FieldInt(j) * b_field_int)
         exponent = pow(2, (j * b), field.MODULUS)
-        G[j] = [G[0][u] * exponent for u in range((2 ** h) - 2)]
-
+        for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
+            G[j][u] = (G[j - 1][u] * exponent)
+        
+        assert len(G[j]) == len(range(1, 2 ** h))
+        
     # Exponentation
+    e = chunks_of_chunks
     R_output = AffinePoint.get_base_point()
-    for k in range(b - 1, 0, -1):
+    for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
         R_output = R_output * 2
-        for j in range(v - 1, 0, -1):
-            # compute I_j_k
-            assert len(chunks_of_chunks) == h
-            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h)]
-            I_j_k = 0
-            for i in range(h - 1):
-                # e_i_j_k_list[i] ais either 0 or 1
-                I_j_k += int(e_i_j_k_list[i]) * (2 ** i)
+        for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
+            I_j_k = sum(e[i][j][k] * (2 ** i) for i in range(h))
             R_output = R_output + G[j][I_j_k]
 
     R_real = g * R.value
