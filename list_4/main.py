@@ -13,6 +13,7 @@ sys.path.append("../list_2_and_3/py")
 import affine
 import field
 import shared
+import copy
 
 AffinePoint = affine.AffinePoint
 FieldInt = field.FieldInt
@@ -76,10 +77,17 @@ def split(num, n_chunks):
     # num_bits = len(num)
     chunk_bits_size = math.ceil(num_bits / n_chunks)
     mask = int("1" * chunk_bits_size, base=2)
+    real_n_chunks = 0
+    num = copy.deepcopy(num)
     while num:
         # yield bin(num & mask)[2:]
         yield IntWithBinIndex(num & mask)
+        real_n_chunks += 1
         num >>= chunk_bits_size
+
+    while real_n_chunks != n_chunks:
+        yield IntWithBinIndex(0)
+        real_n_chunks += 1
 
 
 def main():
@@ -102,7 +110,11 @@ def main():
     b = math.ceil(a / v)
 
     chunks = [*split(R, u)]
+    assert len(chunks) == h
+
     chunks_of_chunks = [[*split(chunk, v)] for chunk in chunks]
+
+    assert all(len(subchunk) <= v for subchunk in chunks_of_chunks)
 
     # First subdivide R into h blocks R_i of size a = math.ceil(l / h)
     two_to_a = 2 ** a
@@ -112,8 +124,6 @@ def main():
         g_list.append(g_list[-1] * two_to_a)
 
     assert len(g_list) == u
-
-    print(f"g_list = {g_list}")
 
     G = [[] for _ in range(v)]
 
@@ -130,18 +140,23 @@ def main():
         G[j] = [G[0][u] * exponent for u in range((2 ** h) - 2)]
 
     # Exponentation
-    R_output = 1
+    R_output = AffinePoint.get_base_point()
     for k in range(b - 1, 0, -1):
-        R_output = R_output ** 2
+        R_output = R_output * 2
         for j in range(v - 1, 0, -1):
             # compute I_j_k
-            assert len(chunks_of_chunks) == h - 1
-            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h - 1)]
+            assert len(chunks_of_chunks) == h
+            e_i_j_k_list = [chunks_of_chunks[i][j][k] for i in range(h)]
             I_j_k = 0
             for i in range(h - 1):
                 # e_i_j_k_list[i] ais either 0 or 1
                 I_j_k += int(e_i_j_k_list[i]) * (2 ** i)
-            R_output = R_output * G[j][I_j_k]
+            R_output = R_output + G[j][I_j_k]
+
+    R_real = g * R.value
+    assert (
+        R_output == R_real
+    ), f"Calculated R_output = {R_output} should be equal to real g * R = {R_real}"
 
 
 if __name__ == "__main__":
