@@ -1,12 +1,54 @@
+import sys
+import json
 import argparse
 import os
 import math
 
+sys.path.append("../list_2_and_3/py")
+
+import affine
+import field
+import shared
+
+
+def _read_sage_params_from_file(file_path):
+    with open(file_path) as f:
+        return json.load(f)
+
+
+def _read_sage_params_from_stdin():
+    return json.loads(input())
+
+
+def _set_curve_params(args):
+    if args.stdin:
+        raw_json = _read_sage_params_from_stdin()
+    else:
+        raw_json = _read_sage_params_from_file(args.path)
+
+    a, b, *_ = raw_json["invariants"]
+    base_point = raw_json["basePoint"]
+    field_order = raw_json["fieldOrder"]
+    curve_order = raw_json["curveOrder"]
+    curve_params = shared.CurveParams(
+        base_point=shared.CurveBasePoint(*base_point),
+        a=a,
+        b=b,
+        field_order=field_order,
+        curve_order=curve_order,
+    )
+    affine.set_curve_params(curve_params)
+    field.set_modulus(field_order)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", type=int, required=True, help='First split')
-    parser.add_argument("-v", type=int, required=True, help='Second split.')
+    parser.add_argument("-u", type=int, required=True, help="First split")
+    parser.add_argument("-v", type=int, required=True, help="Second split.")
+    parser.add_argument("--stdin", action="store_true", default=False)
+    parser.add_argument("--path", type=str, default="params_40.json")
     return parser.parse_args()
+
 
 def split(num, n_chunks):
     """Splits num binary representation into #n chunks of equal size.
@@ -18,21 +60,22 @@ def split(num, n_chunks):
     num_bits = math.ceil(math.log(num, 2))
     chunk_bits_size = math.ceil(num_bits / n_chunks)
 
-    mask = int('1' * chunk_bits_size, base =2)
+    mask = int("1" * chunk_bits_size, base=2)
     while num:
-      yield num & mask
-      num >>= chunk_bits_size
+        yield num & mask
+        num >>= chunk_bits_size
+
 
 def main():
     args = parse_args()
-
-    u = args.u # in the paper denoted as "h"
-    v = args.v # in the paper denoted as "v"
+    _set_curve_params(args)
+    u = args.u  # in the paper denoted as "h"
+    v = args.v  # in the paper denoted as "v"
 
     # Take some g and R, we want to compute g ^ R
-    g = int(os.urandom(256//8).hex(), 16)
-    R = int(os.urandom(256//8).hex(), 16)
-    
+    g = affine.AffinePoint.random()
+    R = affine.AffinePoint.get_random_scalar()
+
     n = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     a = math.ceil(n / u)  # Number of bits in single slice.
 
@@ -40,19 +83,21 @@ def main():
     chunks_of_chunks = [[*split(chunk, v)] for chunk in chunks]
 
     # First subdivide R into h blocks R_i of size a = math.ceil(n / h)
-    import pdb; pdb.set_trace()
+    import pdb
+
+    pdb.set_trace()
 
     # TODO: calculate g_0, g_1, ..., g_h
 
     two_to_a = 2 ** a
 
-    g_list = [g] 
-    for _ in range(1, h):
-      g_list.append(g_list[-1] ** two_to_a)
+    g_list = [g]
+    for i in range(1, u):
+        g_list.append(g_list[-1] ** two_to_a)
+        print(i)
 
-    assert len(g_list) == h
+    assert len(g_list) == u
 
-    
 
 if __name__ == "__main__":
     main()

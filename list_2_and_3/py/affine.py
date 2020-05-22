@@ -146,8 +146,13 @@ class AffinePoint:
         return cls.get_base_point() * random.randint(2, cls._curve_params.curve_order)
 
     @classmethod
-    def get_random_number(cls):
-        return FieldInt(random.randint(2, cls._curve_params.curve_order))
+    # TODO: Move it out of this class as it should be in FieldInt.
+    def get_random_number(cls) -> FieldInt:
+        return FieldInt.random(2, cls._curve_params.curve_order)
+
+    @classmethod
+    def get_random_scalar(cls) -> FieldInt:
+        return cls.get_random_number()
 
     @classmethod
     def get_infinity(cls):
@@ -159,7 +164,7 @@ class AffinePoint:
     @classmethod
     def get_base_point(cls):
         # if cls._base_point:
-            # return cls._base_point
+        # return cls._base_point
         curve_params_base_point = cls._curve_params.base_point
         cls._base_point = cls(x=curve_params_base_point.x, y=curve_params_base_point.y)
         return cls._base_point

@@ -1,3 +1,5 @@
+import random
+
 import shared
 
 
@@ -46,6 +48,19 @@ class FieldInt:
 
     def __rmul__(self, other):
         return self.__mul__(other)
+
+    def __float__(self):
+        return float(self.value)
+
+    def __and__(self, other):
+        return self.value & other
+        
+    def __rshift__(self, other):
+        self.value >>= other
+
+    @classmethod
+    def random(cls, min_value=0, max_value=1):
+        return cls(random.randint(min_value, max_value))
 
     def inverse(self):
         if self.value in INVERSE_CACHE:
