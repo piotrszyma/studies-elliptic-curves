@@ -1,3 +1,4 @@
+import pdb
 import sys
 import json
 import argparse
@@ -8,9 +9,9 @@ from typing import List
 
 sys.path.append("../list_2_and_3/py")
 
-import affine
-import field
 import shared
+import field
+import affine
 
 AffinePoint = affine.AffinePoint
 
@@ -81,13 +82,14 @@ def main():
     g = affine.AffinePoint.random()
     R = affine.AffinePoint.get_random_scalar()
 
-    n = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
-    a = math.ceil(n / u)  # Number of bits in single slice.
+    l = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
+    a = math.ceil(l / h)  # Number of bits in single slice.
+    b = math.ceil(a / v)
 
     chunks = [*split(R, u)]
     chunks_of_chunks = [[*split(chunk, v)] for chunk in chunks]
 
-    # First subdivide R into h blocks R_i of size a = math.ceil(n / h)
+    # First subdivide R into h blocks R_i of size a = math.ceil(l / h)
     two_to_a = 2 ** a
 
     g_list: List[AffinePoint] = [g]
@@ -98,18 +100,22 @@ def main():
 
     print(f"g_list = {g_list}")
 
-    G = []
+    G = [[] for _ in range(v)]
 
     # Calculate G[0][u] for 0 < u < 2**h
     for u in range(1, 2 ** h):
         bin_ids = map(int, bin(u)[2:].zfill(h))
-        gs_to_consider = [g_el for g_el, power in zip(g_list, bin_ids) if power == 1]
-        G.append(functools.reduce(lambda prev, curr: prev + curr, gs_to_consider))
+        gs_to_consider = [r_i for r_i, u_i in zip(g_list, bin_ids) if u_i == 1]
+        G[0].append(functools.reduce(lambda prev, curr: prev + curr, gs_to_consider))
 
     # TODO: Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
-    import pdb
+    for j in range(0, v):
+        # exponent = field.FieldInt(2) * (field.FieldInt(j) * b_field_int)
+        exponent = 2 ** (j * b)
+        exponent %= field.MODULUS
+        G[j] =  [G[0][u] * exponent for u in range((2**h)-2)]
 
-    pdb.set_trace()
+    import pdb; pdb.set_trace()
 
 
 if __name__ == "__main__":
