@@ -35,15 +35,15 @@ def lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks):
     chunks_str = split_str(R_str, h)
     chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str]
 
-    chunks = [int(e, base=2) for e in chunks_str]
-    chunks_of_chunks = []
-    for chunk_str in chunks_of_chunks_str:
-        chunks_of_chunks.append([int(e, base=2) for e in chunk_str])
+    # chunks = [int(e, base=2) for e in chunks_str]
+    # chunks_of_chunks = []
+    # for chunk_str in chunks_of_chunks_str:
+    #     chunks_of_chunks.append([int(e, base=2) for e in chunk_str])
 
-    assert len(chunks) == h
-    assert R == sum(e_i * (2 ** (i * a)) for i, e_i in enumerate(chunks))
-    for i, chunk in enumerate(chunks):
-        assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
+    # assert len(chunks) == h
+    # assert R == sum(e_i * (2 ** (i * a)) for i, e_i in enumerate(chunks))
+    # for i, chunk in enumerate(chunks):
+    #     assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
 
     # Prepare list of g_i.
     g_list = [g * (2 ** (i * a)) for i in range(h)]
