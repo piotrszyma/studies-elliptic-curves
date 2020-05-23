@@ -130,7 +130,7 @@ def main():
     for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
         u_bits = bin(u)[2:].zfill(h)
         r_bits = g_list[::-1]
-        muls = [r for u, r in zip(u_bits, r_bits) if u == '1']
+        muls = [r for u, r in zip(u_bits, r_bits) if u == "1"]
         G[0][u] = 1
         for mul in muls:
             G[0][u] *= mul
@@ -149,7 +149,9 @@ def main():
     for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
         R_output = R_output ** 2
         for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
-            I_j_k = sum(int(chunks_of_chunks_str[i][j][::-1][k]) * (2 ** i) for i in range(h))
+            I_j_k = sum(
+                int(chunks_of_chunks_str[i][j][::-1][k]) * (2 ** i) for i in range(h)
+            )
 
             if I_j_k == 0:
                 print("Warning, I_j_k returned 0...")
