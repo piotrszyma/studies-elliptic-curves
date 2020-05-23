@@ -14,3 +14,6 @@ class IntWithBinIndex(int):
         #     import pdb; pdb.set_trace()
         #     raise
         # return val
+
+    def __repr__(self):
+        return f'{bin(self)} ({str(self)})'

@@ -1,14 +1,9 @@
-import pdb
-import sys
 import json
 import argparse
-import os
 import math
 import random
 import functools
 from typing import List
-
-sys.path.append("../list_2_and_3/py")
 
 import affine
 import field
@@ -60,28 +55,34 @@ def parse_args():
     return parser.parse_args()
 
 
-def split(num, n_chunks):
-    """Splits num binary representation into #n chunks of equal size.
+def split(num, n_of_chunks):
+    """Splits num binary representation into # n_of_chunks of equal size.
 
     e.g. 
       if the number is X = 1101 0101 1010 
       # of chunks = 3 then as # of bits in X is 12 then yields [0b1101, 0b0101, 0b1010]
     """
-    num_bits = len(bin(num)[2:])
-    # num_bits = len(num)
-    chunk_bits_size = math.ceil(num_bits / n_chunks)
-    mask = int("1" * chunk_bits_size, base=2)
-    real_n_chunks = 0
-    num = copy.deepcopy(num)
-    while num:
-        # yield bin(num & mask)[2:]
-        yield IntWithBinIndex(num & mask)
-        real_n_chunks += 1
-        num >>= chunk_bits_size
 
-    while real_n_chunks != n_chunks:
-        yield IntWithBinIndex(0)
-        real_n_chunks += 1
+    n_of_bits_all = math.ceil(math.log(num, 2))  # Number of bits of the exponent.
+    # number of bits in a single slice of slice
+    n_of_bits_chunk = math.ceil(n_of_bits_all / n_of_chunks)
+
+    mask = int("1" * n_of_bits_chunk, base=2)
+    num = copy.deepcopy(num)
+    for _ in range(n_of_chunks):
+        yield IntWithBinIndex(num & mask)
+        num >>= n_of_bits_chunk
+
+
+def split_str(num_str, n_of_chunks):
+    lpad = (math.ceil(len(num_str) / n_of_chunks) * n_of_chunks) - len(num_str)
+    num_str = "0" * lpad + num_str
+    chunk_size = len(num_str) // n_of_chunks
+
+    splitted = []
+    for idx in range(0, len(num_str), chunk_size):
+        splitted.append(num_str[idx : idx + chunk_size])
+    return splitted[::-1]
 
 
 def main():
@@ -95,29 +96,34 @@ def main():
 
     # Take some g and R, we want to compute g ^ R
     g = affine.AffinePoint.random()
-    # g = AffinePoint(336972847628, 312067054078)
     R = affine.AffinePoint.get_random_scalar()
+    # g = AffinePoint(336972847628, 312067054078)
     # R = FieldInt(value=1150191622)
 
-    l = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
-    a = math.ceil(l / h)  # Number of bits in single slice.
-    b = math.ceil(a / v)
+    R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
+    a = math.ceil(R_bits / h)  # Number of bits in single slice.
+    b = math.ceil(a / v)  # number of bits in a single slice of slice
 
-    chunks = [*split(R, u)]
+    R_str = bin(R)[2:]
+
+    chunks_str = split_str(R_str, h)
+    chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str]
+
+    chunks = [int(e, base=2) for e in chunks_str]
+    chunks_of_chunks = []
+    for chunk_str in chunks_of_chunks_str:
+        chunks_of_chunks.append([int(e, base=2) for e in chunk_str])
+
     assert len(chunks) == h
-
-    chunks_of_chunks = [[*split(chunk, v)] for chunk in chunks]
-
-    assert all(len(subchunk) <= v for subchunk in chunks_of_chunks)
-
-    # First subdivide R into h blocks R_i of size a = math.ceil(l / h)
-    two_to_a = 2 ** a
+    assert R == sum(e_i * (2 ** (i * a)) for i, e_i in enumerate(chunks))
+    for i, chunk in enumerate(chunks):
+        assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
 
     g_list: List[AffinePoint] = [g]
-    for _ in range(1, u):
-        g_list.append(g_list[-1] * two_to_a)
+    for i in range(1, h):
+        g_list.append(g * (2 ** (i * a)))
 
-    assert len(g_list) == u
+    assert len(g_list) == h
 
     G = {idx: {} for idx in range(v)}
     # Calculate G[0][u] for 0 < u < 2**h
@@ -133,20 +139,19 @@ def main():
         # exponent = field.FieldInt(2) * (field.FieldInt(j) * b_field_int)
         exponent = pow(2, (j * b), field.MODULUS)
         for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
-            G[j][u] = (G[j - 1][u] * exponent)
-        
+            G[j][u] = G[j - 1][u] * exponent
+
         assert len(G[j]) == len(range(1, 2 ** h))
-        
+
     # Exponentation
-    e = chunks_of_chunks
     R_output = AffinePoint.get_base_point()
     for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
         R_output = R_output * 2
         for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
-            I_j_k = sum(e[i][j][k] * (2 ** i) for i in range(h))
+            I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
 
             if I_j_k == 0:
-                print('Warning, I_j_k returned 0...')
+                print("Warning, I_j_k returned 0...")
                 continue
             R_output = R_output + G[j][I_j_k]
 
