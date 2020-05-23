@@ -14,17 +14,11 @@ import affine
 import field
 import shared
 import copy
+import utils
 
 AffinePoint = affine.AffinePoint
 FieldInt = field.FieldInt
-
-
-class IntWithBinIndex(int):
-    def __getitem__(self, value):
-        try:
-            return int(bin(self)[2:][value])
-        except IndexError:
-            return 0
+IntWithBinIndex = utils.IntWithBinIndex
 
 
 def _read_sage_params_from_file(file_path):
