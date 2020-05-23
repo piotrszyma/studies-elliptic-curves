@@ -95,8 +95,8 @@ def main():
     random.seed(0)  # For repeated randomness.
 
     # Take some g and R, we want to compute g ^ R
-    g = affine.AffinePoint.random()
-    R = affine.AffinePoint.get_random_scalar()
+    g = 122
+    R = 231
     # g = AffinePoint(336972847628, 312067054078)
     # R = FieldInt(value=1150191622)
 
@@ -119,43 +119,44 @@ def main():
     for i, chunk in enumerate(chunks):
         assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
 
-    g_list: List[AffinePoint] = [g]
-    for i in range(1, h):
-        g_list.append(g * (2 ** (i * a)))
+    g_list = []
+    for i in range(h):
+        g_list.append(g ** (2 ** (i * a)))
 
     assert len(g_list) == h
 
     G = {idx: {} for idx in range(v)}
     # Calculate G[0][u] for 0 < u < 2**h
     for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
-        bin_ids = map(int, bin(u)[2:].zfill(h))
-        gs_to_consider = [r_i for r_i, u_i in zip(g_list, bin_ids) if u_i == 1]
-        G[0][u] = functools.reduce(lambda prev, curr: prev + curr, gs_to_consider)
+        u_bits = bin(u)[2:].zfill(h)
+        r_bits = g_list[::-1]
+        muls = [r for u, r in zip(u_bits, r_bits) if u == '1']
+        G[0][u] = 1
+        for mul in muls:
+            G[0][u] *= mul
 
     assert len(G[0]) == len(range(1, 2 ** h))
 
     # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
     for j in range(1, v):
         # exponent = field.FieldInt(2) * (field.FieldInt(j) * b_field_int)
-        exponent = pow(2, (j * b), field.MODULUS)
+        exponent = 2 ** (j * b)
         for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
-            G[j][u] = G[j - 1][u] * exponent
-
-        assert len(G[j]) == len(range(1, 2 ** h))
+            G[j][u] = G[0][u] ** exponent
 
     # Exponentation
-    R_output = AffinePoint.get_base_point()
+    R_output = 1
     for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
-        R_output = R_output * 2
+        R_output = R_output ** 2
         for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
-            I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
+            I_j_k = sum(int(chunks_of_chunks_str[i][j][::-1][k]) * (2 ** i) for i in range(h))
 
             if I_j_k == 0:
                 print("Warning, I_j_k returned 0...")
                 continue
-            R_output = R_output + G[j][I_j_k]
+            R_output = R_output * G[j][I_j_k]
 
-    R_real = g * R.value
+    R_real = g ** R
     assert (
         R_output == R_real
     ), f"Calculated R_output = {R_output} should be equal to real g * R = {R_real}"
