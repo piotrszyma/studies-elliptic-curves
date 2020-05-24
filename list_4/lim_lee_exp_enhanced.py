@@ -103,7 +103,7 @@ def optimize_parameters(R_bits, S_max):
     best_a = None
     best_b = None
     
-    for a in tqdm(range(1, 10000)):
+    for a in tqdm(range(1, 1000)):
         for b in range(1, 1000):
             h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
             S = compute_storage_requirement(h, v, v_last)
@@ -114,9 +114,11 @@ def optimize_parameters(R_bits, S_max):
                     curr_no_of_operations = no_of_operations
                     best_a = a 
                     best_b = b
-    print(curr_S)
-    print(curr_no_of_operations)
-    print(best_a, best_b)
+    
+    print(f"Storage used: {curr_S}")
+    print(f"Operations performed {curr_no_of_operations}")
+    print(f"a: {best_a}, b: {best_b}")
+    return best_a, best_b
 
 def compute_parameters(R_bits, a, b):
 
@@ -145,4 +147,4 @@ def compute_storage_requirement(h, v, v_last):
 
 
 if __name__ == "__main__":
-    optimize_parameters(12500, 500)
+   a,b = optimize_parameters(1250, 500)
