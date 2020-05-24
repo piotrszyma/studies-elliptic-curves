@@ -50,7 +50,10 @@ b_last: {b_last}
 """)
 
     chunks_str = split_str(R_str, h)
-    chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str]
+    chunks_str[-1] = chunks_str[-1][-a_last:]
+
+    chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str[:-1]]
+    chunks_of_chunks_str.append(split_str(chunks_str[-1], v_last))
 
     # chunks = [int(e, base=2) for e in chunks_str]
     # chunks_of_chunks = []
@@ -90,9 +93,12 @@ b_last: {b_last}
     for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
         R_output = R_output * 2
         for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
-            I_j_k = sum(
-                int(chunks_of_chunks_str[i][j][::-1][k]) * (2 ** i) for i in range(h)
-            )
+            I_j_k = 0
+            for i in range(h):
+                try:
+                    I_j_k += int(chunks_of_chunks_str[i][j][::-1][k]) * (2 ** i)
+                except IndexError:
+                    pass
 
             if I_j_k == 0:
                 print("Warning, I_j_k returned 0...")
