@@ -1,4 +1,3 @@
-
 class IntWithBinIndex(int):
     def __getitem__(self, value):
         # try:
@@ -16,4 +15,4 @@ class IntWithBinIndex(int):
         # return val
 
     def __repr__(self):
-        return f'{bin(self)} ({str(self)})'
+        return f"{bin(self)} ({str(self)})"

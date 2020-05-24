@@ -4,6 +4,7 @@ import shared
 import affine
 import field
 
+
 def _read_sage_params_from_file(file_path):
     with open(file_path) as f:
         return json.load(f)

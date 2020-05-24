@@ -30,8 +30,8 @@ def lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks, num_of_subchunks_las
     R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     a = math.ceil(R_bits / h)  # Number of bits in single slice.
 
-    b2 = math.ceil((R_bits) / (v * (h-1) + v_last))  # IDK yet
-    b1 = math.ceil((R_bits - b2 * h * v_last) / ((h-1) * (v - v_last)))  # IDK yet
+    b2 = math.ceil((R_bits) / (v * (h - 1) + v_last))  # IDK yet
+    b1 = math.ceil((R_bits - b2 * h * v_last) / ((h - 1) * (v - v_last)))  # IDK yet
 
     R_str = bin(R)[2:]
 

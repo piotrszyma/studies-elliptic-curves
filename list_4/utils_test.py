@@ -7,7 +7,7 @@ IntWithBinIndex = utils.IntWithBinIndex
 
 class UtilsTests(unittest.TestCase):
     def test_int_with_bin_index(self):
-        num = int('0b1010110111', base=2)
+        num = int("0b1010110111", base=2)
 
         wrapped = IntWithBinIndex(num)
 
@@ -23,8 +23,6 @@ class UtilsTests(unittest.TestCase):
         assert wrapped[9] == 1
         assert wrapped[10] == 0
         assert wrapped[100] == 0
-
-
 
 
 if __name__ == "__main__":

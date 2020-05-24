@@ -37,7 +37,7 @@ def main():
         R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(g, R, args.a, args.b)
     else:
         R_output = lim_lee_exp.lim_lee_exp(g, R, h, v)
-        
+
     R_real = g * R.value
 
     assert (
