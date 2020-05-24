@@ -16,7 +16,7 @@ def split_str(num_str, n_of_chunks):
 
     splitted = []
     for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx: idx + chunk_size])
+        splitted.append(num_str[idx : idx + chunk_size])
     return splitted[::-1]
 
 
@@ -28,7 +28,8 @@ def lim_lee_exp_enhanced(base, exp, a, b):
     R_str = bin(R)[2:]
     h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
 
-    print(f"""
+    print(
+        f"""
 Running lim-lee enhanced (v2) with
 
 l: {R_bits}
@@ -39,7 +40,8 @@ a: {a}
 a_last: {a_last}
 b: {b}
 b_last: {b_last}
-""")
+"""
+    )
 
     chunks_str = split_str(R_str, h)
     chunks_str[-1] = chunks_str[-1][-a_last:]
@@ -102,7 +104,7 @@ def optimize_parameters(R_bits, S_max):
     curr_no_of_operations = math.inf
     best_a = None
     best_b = None
-    
+
     for a in tqdm(range(1, 1000)):
         for b in range(1, 1000):
             h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
@@ -112,13 +114,14 @@ def optimize_parameters(R_bits, S_max):
                 no_of_operations = compute_number_of_operations(a, b, a_last, h)
                 if no_of_operations < curr_no_of_operations:
                     curr_no_of_operations = no_of_operations
-                    best_a = a 
+                    best_a = a
                     best_b = b
-    
+
     print(f"Storage used: {curr_S}")
     print(f"Operations performed {curr_no_of_operations}")
     print(f"a: {best_a}, b: {best_b}")
     return best_a, best_b
+
 
 def compute_parameters(R_bits, a, b):
 
@@ -135,16 +138,16 @@ def compute_parameters(R_bits, a, b):
 
 
 def compute_number_of_operations(a, b, a_last, h):
-    squarings = b-1
-    mul_left = (a - a_last) * ((2**(h-1) - 1) / (2**(h-1)))
-    mul_right = a_last * ((2**h - 1) / (2**h)) - 1
+    squarings = b - 1
+    mul_left = (a - a_last) * ((2 ** (h - 1) - 1) / (2 ** (h - 1)))
+    mul_right = a_last * ((2 ** h - 1) / (2 ** h)) - 1
     multiplications = mul_left + mul_right
     return squarings + multiplications
 
 
 def compute_storage_requirement(h, v, v_last):
-    return (2**h - 1) * v_last + (2**(h-1)-1) * (v-v_last)
+    return (2 ** h - 1) * v_last + (2 ** (h - 1) - 1) * (v - v_last)
 
 
 if __name__ == "__main__":
-   a,b = optimize_parameters(1250, 500)
+    a, b = optimize_parameters(1250, 500)
