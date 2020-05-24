@@ -19,28 +19,35 @@ def split_str(num_str, n_of_chunks):
     return splitted[::-1]
 
 
-def lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks):
+def lim_lee_exp_enhanced(base, exp, a, b):
     g = base
     R = exp
-    h = num_of_chunks
-    v = num_of_subchunks
-
+    
     # Generate chunks of chunks.
     R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
-    a = math.ceil(R_bits / h)  # Number of bits in single slice.
-    b = math.ceil(a / v)  # number of bits in a single slice of slice
+    R_str = bin(R)[2:]
+
+    h = math.ceil(R_bits / a)
+    v = math.ceil(a / b)
+
+    a_last = R_bits - a * (h - 1)
+
+    v_last = math.ceil(a_last / b)
+
+    b_last = a_last - b * (v_last - 1)
 
     print(f"""
-Running lim-lee with
+Running lim-lee enhanced (v2) with
 
 l: {R_bits}
 h: {h}
 v: {v}
+v_last: {v_last}
 a: {a}
+a_last: {a_last}
 b: {b}
+b_last: {b_last}
 """)
-
-    R_str = bin(R)[2:]
 
     chunks_str = split_str(R_str, h)
     chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str]

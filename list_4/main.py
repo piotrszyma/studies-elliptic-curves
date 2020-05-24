@@ -4,6 +4,7 @@ import affine
 import field
 import setup
 import lim_lee_exp
+import lim_lee_exp_enhanced
 
 AffinePoint = affine.AffinePoint
 FieldInt = field.FieldInt
@@ -11,10 +12,13 @@ FieldInt = field.FieldInt
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", type=int, required=True, help="First split")
-    parser.add_argument("-v", type=int, required=True, help="Second split.")
+    parser.add_argument("-u", type=int)
+    parser.add_argument("-v", type=int)
+    parser.add_argument("-a", type=int)
+    parser.add_argument("-b", type=int)
     parser.add_argument("--stdin", action="store_true", default=False)
     parser.add_argument("--path", type=str, default="params_40.json")
+    parser.add_argument("--enhanced", action="store_true", default=False)
     return parser.parse_args()
 
 
@@ -29,7 +33,11 @@ def main():
 
     g = AffinePoint(336972847628, 312067054078)
     R = FieldInt(value=1150191622)
-    R_output = lim_lee_exp.lim_lee_exp(g, R, h, v)
+    if args.enhanced:
+        R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(g, R, args.a, args.b)
+    else:
+        R_output = lim_lee_exp.lim_lee_exp(g, R, h, v)
+        
     R_real = g * R.value
 
     assert (
