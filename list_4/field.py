@@ -16,9 +16,9 @@ class FieldInt:
     _instances = {}
 
     def __init__(self, value):
-        
+
         if MODULUS is None:
-            raise RuntimeError('First field.set_modulus(...)')
+            raise RuntimeError("First field.set_modulus(...)")
 
         self.value = value % MODULUS
 
@@ -57,7 +57,7 @@ class FieldInt:
 
     def __and__(self, other):
         return self.value & other
-        
+
     def __rshift__(self, other):
         self.value >>= other
         return self

@@ -30,7 +30,8 @@ def lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks):
     a = math.ceil(R_bits / h)  # Number of bits in single slice.
     b = math.ceil(a / v)  # number of bits in a single slice of slice
 
-    print(f"""
+    print(
+        f"""
 Running lim-lee with
 
 l: {R_bits}
@@ -38,7 +39,8 @@ h: {h}
 v: {v}
 a: {a}
 b: {b}
-""")
+"""
+    )
 
     R_str = bin(R)[2:]
 
