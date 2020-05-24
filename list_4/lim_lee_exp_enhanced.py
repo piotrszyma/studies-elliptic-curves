@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import math
 import affine
 import field
@@ -15,26 +16,17 @@ def split_str(num_str, n_of_chunks):
 
     splitted = []
     for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx : idx + chunk_size])
+        splitted.append(num_str[idx: idx + chunk_size])
     return splitted[::-1]
 
 
 def lim_lee_exp_enhanced(base, exp, a, b):
     g = base
     R = exp
-    
     # Generate chunks of chunks.
     R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     R_str = bin(R)[2:]
-
-    h = math.ceil(R_bits / a)
-    v = math.ceil(a / b)
-
-    a_last = R_bits - a * (h - 1)
-
-    v_last = math.ceil(a_last / b)
-
-    b_last = a_last - b * (v_last - 1)
+    h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
 
     print(f"""
 Running lim-lee enhanced (v2) with
@@ -54,16 +46,6 @@ b_last: {b_last}
 
     chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str[:-1]]
     chunks_of_chunks_str.append(split_str(chunks_str[-1], v_last))
-
-    # chunks = [int(e, base=2) for e in chunks_str]
-    # chunks_of_chunks = []
-    # for chunk_str in chunks_of_chunks_str:
-    #     chunks_of_chunks.append([int(e, base=2) for e in chunk_str])
-
-    # assert len(chunks) == h
-    # assert R == sum(e_i * (2 ** (i * a)) for i, e_i in enumerate(chunks))
-    # for i, chunk in enumerate(chunks):
-    #     assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
 
     # Prepare list of g_i.
     g_list = [g * (2 ** (i * a)) for i in range(h)]
@@ -106,3 +88,54 @@ b_last: {b_last}
             R_output = R_output + G[j][I_j_k]
 
     return R_output
+
+
+def optimize_parameters(R_bits, S_max):
+    curr_S = math.inf
+    curr_no_of_operations = math.inf
+    best_a = None
+    best_b = None
+    
+    for a in tqdm(range(1, 10000)):
+        for b in range(1, 1000):
+            h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
+            S = compute_storage_requirement(h, v, v_last)
+            if S < S_max:
+                curr_S = S
+                no_of_operations = compute_number_of_operations(a, b, a_last, h)
+                if no_of_operations < curr_no_of_operations:
+                    curr_no_of_operations = no_of_operations
+                    best_a = a 
+                    best_b = b
+    print(curr_S)
+    print(curr_no_of_operations)
+    print(best_a, best_b)
+
+def compute_parameters(R_bits, a, b):
+
+    h = math.ceil(R_bits / a)
+    v = math.ceil(a / b)
+
+    a_last = R_bits - a * (h - 1)
+
+    v_last = math.ceil(a_last / b)
+
+    b_last = a_last - b * (v_last - 1)
+
+    return h, v, a_last, v_last, b_last
+
+
+def compute_number_of_operations(a, b, a_last, h):
+    squarings = b-1
+    mul_left = (a - a_last) * ((2**(h-1) - 1) / (2**(h-1)))
+    mul_right = a_last * ((2**h - 1) / (2**h)) - 1
+    multiplications = mul_left + mul_right
+    return squarings + multiplications
+
+
+def compute_storage_requirement(h, v, v_last):
+    return (2**h - 1) * v_last + (2**(h-1)-1) * (v-v_last)
+
+
+if __name__ == "__main__":
+    optimize_parameters(12500, 500)
