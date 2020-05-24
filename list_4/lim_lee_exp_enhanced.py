@@ -83,10 +83,17 @@ b_last: {b_last}
     assert len(G[0]) == len(range(1, 2 ** h))
 
     # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
-    for j in range(1, v):
+    for j in range(1, v - 1):
         exponent = 2 ** (j * b)
         for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
             G[j][u] = G[0][u] * exponent
+
+    # For the last.
+    j = v - 1
+    exponent = 2 ** (j * b)
+    # TODO: Figure out if this loop can be over smaller range?
+    for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
+        G[j][u] = G[0][u] * exponent
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
