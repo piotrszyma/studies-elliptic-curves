@@ -21,28 +21,13 @@ def split_str(num_str, n_of_chunks):
     return splitted[::-1]
 
 
-def lim_lee_exp_enhanced(base, exp, a, b):
+def build_lookup_table(base, exp, a, b):
     g = base
     R = exp
     # Generate chunks of chunks.
     R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     R_str = bin(R)[2:]
     h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
-
-    print(
-        f"""
-Running lim-lee enhanced (v2) with
-
-l: {R_bits}
-h: {h}
-v: {v}
-v_last: {v_last}
-a: {a}
-a_last: {a_last}
-b: {b}
-b_last: {b_last}
-"""
-    )
 
     chunks_str = split_str(R_str, h)
     chunks_str[-1] = chunks_str[-1][-a_last:]
@@ -66,18 +51,22 @@ b_last: {b_last}
             G[0][u] += mul
 
     assert len(G[0]) == len(range(1, 2 ** h))
+    return G
 
-    # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
-    for j in range(1, v_last):
-        exponent = 2 ** (j * b)
-        for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
-            G[j][u] = G[0][u] * exponent
 
-    # For the last.
-    for j in range(0, v - v_last):
-        exponent = 2 ** ((v_last + j) * b)
-        for u in range(1, 2 ** (h - 1)):
-            G[v_last + j][u] = G[0][u] * exponent
+def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
+    R = exp
+    # Generate chunks of chunks.
+    R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
+    R_str = bin(R)[2:]
+    h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
+    G = precomputed_G if precomputed_G else build_lookup_table(base, exp, a, b)
+
+    chunks_str = split_str(R_str, h)
+    chunks_str[-1] = chunks_str[-1][-a_last:]
+
+    chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str[:-1]]
+    chunks_of_chunks_str.append(split_str(chunks_str[-1], v_last))
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
@@ -150,17 +139,3 @@ def compute_number_of_operations(a, b, a_last, h):
 
 def compute_storage_requirement(h, v, v_last):
     return (2 ** h - 1) * v_last + (2 ** (h - 1) - 1) * (v - v_last)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--r-bits", type=int, help="Number of bits in number.", required=True,
-    )
-    parser.add_argument(
-        "--s-max", type=int, help="Max storage", required=True,
-    )
-    args = parser.parse_args()
-    print(f"Searching for # of bits: {args.r_bits} and max storage: {args.s_max}")
-    a, b = optimize_parameters(R_bits=args.r_bits, S_max=args.s_max)
-    print(f"Found: a: {a} and b: {b}")
