@@ -1,5 +1,3 @@
-import argparse
-
 from tqdm import tqdm
 
 import math
