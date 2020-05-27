@@ -16,7 +16,7 @@ def split_str(num_str, n_of_chunks):
 
     splitted = []
     for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx : idx + chunk_size])
+        splitted.append(num_str[idx: idx + chunk_size])
     return splitted[::-1]
 
 
@@ -65,19 +65,19 @@ b_last: {b_last}
             G[0][u] += mul
 
     assert len(G[0]) == len(range(1, 2 ** h))
+    import pdb; pdb.set_trace()
 
     # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
-    for j in range(1, v - 1):
+    for j in range(1, v_last):
         exponent = 2 ** (j * b)
         for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
             G[j][u] = G[0][u] * exponent
 
     # For the last.
-    j = v - 1
-    exponent = 2 ** (j * b)
-    # TODO: Figure out if this loop can be over smaller range?
-    for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
-        G[j][u] = G[0][u] * exponent
+    for j in range(0, v - v_last):
+        exponent = 2 ** ((v_last+j) * b)
+        for u in range(1, 2 ** (h-1)):
+            G[v_last+j][u] = G[0][u] * exponent
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
@@ -94,8 +94,11 @@ b_last: {b_last}
             if I_j_k == 0:
                 print("Warning, I_j_k returned 0...")
                 continue
-            R_output = R_output + G[j][I_j_k]
 
+            try:
+                R_output = R_output + G[j][I_j_k]
+            except:
+                pass
     return R_output
 
 
