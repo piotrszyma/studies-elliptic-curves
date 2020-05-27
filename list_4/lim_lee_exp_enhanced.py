@@ -21,19 +21,8 @@ def split_str(num_str, n_of_chunks):
     return splitted[::-1]
 
 
-def build_lookup_table(base, exp, a, b):
-    g = base
-    R = exp
-    # Generate chunks of chunks.
-    R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
-    R_str = bin(R)[2:]
-    h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
-
-    chunks_str = split_str(R_str, h)
-    chunks_str[-1] = chunks_str[-1][-a_last:]
-
-    chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str[:-1]]
-    chunks_of_chunks_str.append(split_str(chunks_str[-1], v_last))
+def build_lookup_table(g, num_bits, a, b):
+    h, v, a_last, v_last, b_last = compute_parameters(num_bits, a, b)
 
     # Prepare list of g_i.
     g_list = [g * (2 ** (i * a)) for i in range(h)]
@@ -60,7 +49,7 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
     R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     R_str = bin(R)[2:]
     h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
-    G = precomputed_G if precomputed_G else build_lookup_table(base, exp, a, b)
+    G = precomputed_G if precomputed_G else build_lookup_table(base, R_bits, a, b)
 
     chunks_str = split_str(R_str, h)
     chunks_str[-1] = chunks_str[-1][-a_last:]
