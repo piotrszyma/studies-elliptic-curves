@@ -107,7 +107,7 @@ def optimize_parameters(R_bits, S_max):
     best_a = None
     best_b = None
 
-    for a in tqdm(range(1, 1000)):
+    for a in tqdm(range(1, R_bits)):
         for b in range(1, a):
             h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
             S = compute_storage_requirement(h, v, v_last)

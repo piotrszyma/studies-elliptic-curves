@@ -31,6 +31,8 @@ def main():
     h = u
     # random.seed(0)  # For repeated randomness.
 
+    # skalar losowy, dl 520 bitów zredukowany modulo rzad punktu bazowego
+
     g = AffinePoint(336972847628, 312067054078)
     R = FieldInt(value=1150191622)
     if args.enhanced:
