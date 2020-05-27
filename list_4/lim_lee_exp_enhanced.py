@@ -1,4 +1,7 @@
+import argparse
+
 from tqdm import tqdm
+
 import math
 import affine
 import field
@@ -16,7 +19,7 @@ def split_str(num_str, n_of_chunks):
 
     splitted = []
     for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx: idx + chunk_size])
+        splitted.append(num_str[idx : idx + chunk_size])
     return splitted[::-1]
 
 
@@ -74,9 +77,9 @@ b_last: {b_last}
 
     # For the last.
     for j in range(0, v - v_last):
-        exponent = 2 ** ((v_last+j) * b)
-        for u in range(1, 2 ** (h-1)):
-            G[v_last+j][u] = G[0][u] * exponent
+        exponent = 2 ** ((v_last + j) * b)
+        for u in range(1, 2 ** (h - 1)):
+            G[v_last + j][u] = G[0][u] * exponent
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
@@ -152,4 +155,14 @@ def compute_storage_requirement(h, v, v_last):
 
 
 if __name__ == "__main__":
-    a, b = optimize_parameters(1250, 500)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--r-bits", type=int, help="Number of bits in number.", required=True,
+    )
+    parser.add_argument(
+        "--s-max", type=int, help="Max storage", required=True,
+    )
+    args = parser.parse_args()
+    print(f"Searching for # of bits: {args.r_bits} and max storage: {args.s_max}")
+    a, b = optimize_parameters(R_bits=args.r_bits, S_max=args.s_max)
+    print(f"Found: a: {a} and b: {b}")
