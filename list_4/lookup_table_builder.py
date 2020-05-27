@@ -12,12 +12,11 @@ FieldInt = field.FieldInt
 
 
 def main(args):
-    g = AffinePoint(336972847628, 312067054078)
-    exp = FieldInt(value=1150191622)
+    g = AffinePoint(args.gx, args.gy)
     a = args.a
     b = args.b
-    base = g
-    precomputed_G = lim_lee_exp_enhanced.build_lookup_table(base, exp, a, b)
+    num_bits = args.num_bits
+    precomputed_G = lim_lee_exp_enhanced.build_lookup_table(g, num_bits, a, b)
 
     with open(args.output_path, "wb+") as f:
         pickle.dump(precomputed_G, f)
@@ -25,6 +24,9 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--gx", type=int, required=True, help='x of base AffinePoint')
+    parser.add_argument("--gy", type=int, required=True, help='y of base AffinePoint')
+    parser.add_argument("--num-bits", type=int, required=True, help='Num of bits')
     parser.add_argument("-a", type=int, required=True)
     parser.add_argument("-b", type=int, required=True)
     parser.add_argument("--stdin", action="store_true", default=False)
