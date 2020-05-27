@@ -1,3 +1,5 @@
+# Example usage:
+# python3 lookup_table_builder.py -a 74 -b 19 --gx 336972847628 --gy 312067054078 --num-bits 40
 import argparse
 import math
 import pickle
