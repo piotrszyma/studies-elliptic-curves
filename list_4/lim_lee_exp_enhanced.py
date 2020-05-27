@@ -65,7 +65,6 @@ b_last: {b_last}
             G[0][u] += mul
 
     assert len(G[0]) == len(range(1, 2 ** h))
-    import pdb; pdb.set_trace()
 
     # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
     for j in range(1, v_last):
