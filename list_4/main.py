@@ -19,30 +19,36 @@ def parse_args():
     parser.add_argument("--stdin", action="store_true", default=False)
     parser.add_argument("--path", type=str, default="params_40.json")
     parser.add_argument("--enhanced", action="store_true", default=False)
+    parser.add_argument("--gx", type=int, required=True, help='x of base AffinePoint')
+    parser.add_argument("--gy", type=int, required=True, help='y of base AffinePoint')
+    parser.add_argument(
+        "--R", type=int, required=True, help='Value by which to multiply affine point')
+
     parser.add_argument(
         "--lookups-path", type=str, help="If not provided, will calculate lookups."
     )
     return parser.parse_args()
 
 
+# python3 main.py -a 185 -b 47 --path params_40.json --enhanced --gx 336972847628 --gy 312067054078 --R 1150191622
 def main():
     args = parse_args()
     setup.set_curve_params(args)
 
-    u = args.u  # in the paper denoted as "h"
-    v = args.v  # in the paper denoted as "v"
-    h = u
-    # random.seed(0)  # For repeated randomness.
-
     # skalar losowy, dl 520 bitów zredukowany modulo rzad punktu bazowego
 
     # TODO: Take from input or something?
-    g = AffinePoint(336972847628, 312067054078)
-    R = FieldInt(value=1150191622)
+
+    # -    g = AffinePoint(336972847628, 312067054078)
+    # -    R = FieldInt(value=1150191622)
+    g = AffinePoint(args.gx, args.gy)
+    R = FieldInt(value=args.R)
 
     if args.enhanced:
         R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(g, R, args.a, args.b)
     else:
+        v = args.v  # in the paper denoted as "v"
+        h = args.u
         R_output = lim_lee_exp.lim_lee_exp(g, R, h, v)
 
     R_real = g * R.value
