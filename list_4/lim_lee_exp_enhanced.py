@@ -17,7 +17,7 @@ def split_str(num_str, n_of_chunks):
 
     splitted = []
     for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx : idx + chunk_size])
+        splitted.append(num_str[idx: idx + chunk_size])
     return splitted[::-1]
 
 
@@ -77,8 +77,12 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
+    no_of_additions = 0
+    no_of_mutliplications = 0
+
     for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
         R_output = R_output * 2
+        no_of_mutliplications += 1
         for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
             I_j_k = 0
             for i in range(h):
@@ -95,6 +99,9 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
                 R_output = R_output + G[j][I_j_k]
             except IndexError:
                 pass
+            no_of_additions += 1
+    print(f"# of Additions: {no_of_additions}")
+    print(f"# of Multiplications: {no_of_mutliplications}")
     return R_output
 
 

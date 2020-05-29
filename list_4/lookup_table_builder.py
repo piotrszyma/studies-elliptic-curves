@@ -19,6 +19,7 @@ def main(args):
     b = args.b
     num_bits = args.num_bits
     precomputed_G = lim_lee_exp_enhanced.build_lookup_table(g, num_bits, a, b)
+
     with open(args.output_path, "wb") as f:
         pickle.dump(precomputed_G, f)
 
