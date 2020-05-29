@@ -1,12 +1,9 @@
-import random
 import unittest
 
 import lim_lee_exp_enhanced
-import lookup_table_builder
-import params_finder
 import affine
 import field
-from affine import AffinePoint, set_curve_params
+from affine import set_curve_params
 from shared import CurveBasePoint, CurveParams
 
 AffinePoint = affine.AffinePoint
