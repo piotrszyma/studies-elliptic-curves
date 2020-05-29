@@ -19,6 +19,9 @@ def parse_args():
     parser.add_argument("--stdin", action="store_true", default=False)
     parser.add_argument("--path", type=str, default="params_40.json")
     parser.add_argument("--enhanced", action="store_true", default=False)
+    parser.add_argument(
+        "--lookups-path", type=str, help="If not provided, will calculate lookups."
+    )
     return parser.parse_args()
 
 
@@ -33,8 +36,10 @@ def main():
 
     # skalar losowy, dl 520 bitów zredukowany modulo rzad punktu bazowego
 
+    # TODO: Take from input or something?
     g = AffinePoint(336972847628, 312067054078)
     R = FieldInt(value=1150191622)
+
     if args.enhanced:
         R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(g, R, args.a, args.b)
     else:
