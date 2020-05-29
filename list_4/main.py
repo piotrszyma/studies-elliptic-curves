@@ -55,6 +55,12 @@ def parse_args():
 # python3 lookup_table_builder.py -a 22 -b 6 --gx 336972847628 --gy 312067054078 --num-bits 150 --output-path lookup_table.pkl --path params_nist.json
 # python3 main.py -a 22 -b 6 --path params_nist.json --enhanced --gx 336972847628 --gy 312067054078 --R 1269975484272894765069569234886311445905563823 --lookups-path lookup_table.pkl
 #
+# Example for R between 255 - 256 bits.
+#
+# python3 params_finder.py --r-bits 256 --s-max 100
+# python3 lookup_table_builder.py -a 52 -b 18 --gx 178539744208 --gy 550836080620 --num-bits 256 --output-path lookup_table.pkl --path params_nist.json
+# python3 main.py -a 52 -b 18 --path params_nist.json --enhanced --gx 178539744208 --gy 550836080620 --R 38370904799379009340869716893911344840570837879123578125448587532243824333451 --lookups-path lookup_table.pkl
+#
 
 def main():
     args = parse_args()
