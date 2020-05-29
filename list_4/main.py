@@ -39,7 +39,7 @@ def parse_args():
 
 # Examples of usage:
 # For finding optimal a and b.
-# python3 python3 params_finder.py --r-bits 150 --s-max 500
+# python3 params_finder.py --r-bits 150 --s-max 500
 
 # For generating lookups table.
 # python3 lookup_table_builder.py -a 185 -b 47 --gx 336972847628 --gy 312067054078 --num-bits 40 --output-path lookup_table.pkl
