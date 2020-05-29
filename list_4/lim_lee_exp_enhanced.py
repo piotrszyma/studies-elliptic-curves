@@ -99,7 +99,9 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
                 R_output = R_output + G[j][I_j_k]
             except IndexError:
                 pass
-            no_of_additions += 1
+            else:
+                no_of_additions += 1
+
     print(f"# of Additions: {no_of_additions}")
     print(f"# of Multiplications: {no_of_mutliplications}")
     return R_output
