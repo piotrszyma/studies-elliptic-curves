@@ -47,11 +47,14 @@ def parse_args():
 # For calculating using lookups table (with --lookups-path argument)
 # python3 main.py -a 185 -b 47 --path params_40.json --enhanced --gx 336972847628 --gy 312067054078 --R 1150191622 --lookups-path lookup_table.pkl
 
-# between 149 - 150 bits
-# -a 22 -b 6
-# --gx 336972847628 --gy 312067054078
-# --R 1269975484272894765069569234886311445905563823
-
+# More examples...
+#
+# Example for R between 149 - 150 bits.
+#
+# python3 params_finder.py --r-bits 150 --s-max 500
+# python3 lookup_table_builder.py -a 22 -b 6 --gx 336972847628 --gy 312067054078 --num-bits 150 --output-path lookup_table.pkl --path params_nist.json
+# python3 main.py -a 22 -b 6 --path params_nist.json --enhanced --gx 336972847628 --gy 312067054078 --R 1269975484272894765069569234886311445905563823 --lookups-path lookup_table.pkl
+#
 
 def main():
     args = parse_args()
