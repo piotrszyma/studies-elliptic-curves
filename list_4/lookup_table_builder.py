@@ -19,8 +19,7 @@ def main(args):
     b = args.b
     num_bits = args.num_bits
     precomputed_G = lim_lee_exp_enhanced.build_lookup_table(g, num_bits, a, b)
-
-    with open(args.output_path, "wb+") as f:
+    with open(args.output_path, "wb") as f:
         pickle.dump(precomputed_G, f)
 
 
@@ -32,8 +31,8 @@ def parse_args():
     parser.add_argument("-a", type=int, required=True)
     parser.add_argument("-b", type=int, required=True)
     parser.add_argument("--stdin", action="store_true", default=False)
-    parser.add_argument("--path", type=str, default="params_40.json")
-    parser.add_argument("--output-path", type=str, default='lookup_table.pkl')
+    parser.add_argument("--path", type=str)
+    parser.add_argument("--output-path", type=str)
     return parser.parse_args()
 
 
