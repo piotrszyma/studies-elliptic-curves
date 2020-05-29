@@ -36,8 +36,18 @@ def parse_args():
     )
     return parser.parse_args()
 
-# python3 lookup_table_builder.py -a 185 -b 47 --gx 336972847628 --gy 312067054078 --num-bits 40
-# python3 main.py -a 185 -b 47 --path params_40.json --enhanced --gx 336972847628 --gy 312067054078 --R 1150191622
+
+# Examples of usage:
+# For finding optimal a and b.
+# python3 python3 params_finder.py --r-bits 150 --s-max 500
+
+# For generating lookups table.
+# python3 lookup_table_builder.py -a 185 -b 47 --gx 336972847628 --gy 312067054078 --num-bits 40 --output-path lookup_table.pkl
+
+# For calculating using lookups table (with --lookups-path argument)
+# python3 main.py -a 185 -b 47 --path params_40.json --enhanced --gx 336972847628 --gy 312067054078 --R 1150191622 --lookups-path lookup_table.pkl
+
+
 def main():
     args = parse_args()
     setup.set_curve_params(args)
