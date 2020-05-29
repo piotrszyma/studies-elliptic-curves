@@ -17,18 +17,20 @@ def split_str(num_str, n_of_chunks):
 
     splitted = []
     for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx: idx + chunk_size])
+        splitted.append(num_str[idx : idx + chunk_size])
     return splitted[::-1]
 
 
 def build_lookup_table(g, num_bits, a, b):
-    print(f"""
+    print(
+        f"""
     Building lookup table for
     g: {g}
     num_bits: {num_bits}
     a: {a}
     b: {b}
-    """)
+    """
+    )
     h, v, a_last, v_last, b_last = compute_parameters(num_bits, a, b)
 
     # Prepare list of g_i.
@@ -57,6 +59,10 @@ def build_lookup_table(g, num_bits, a, b):
         exponent = 2 ** ((v_last + j) * b)
         for u in range(1, 2 ** (h - 1)):
             G[v_last + j][u] = G[0][u] * exponent
+
+    lookup_table_size = sum(1 for row in G.values() for _ in row)
+
+    print(f"Look-up table size: {lookup_table_size}")
 
     return G
 
