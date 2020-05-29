@@ -40,6 +40,17 @@ def build_lookup_table(g, num_bits, a, b):
             G[0][u] += mul
 
     assert len(G[0]) == len(range(1, 2 ** h))
+
+    for j in range(1, v_last):
+        exponent = 2 ** (j * b)
+        for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
+            G[j][u] = G[0][u] * exponent
+
+    for j in range(0, v - v_last):
+        exponent = 2 ** ((v_last + j) * b)
+        for u in range(1, 2 ** (h - 1)):
+            G[v_last + j][u] = G[0][u] * exponent
+
     return G
 
 
