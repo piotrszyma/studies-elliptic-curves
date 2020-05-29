@@ -1,4 +1,5 @@
 import unittest
+import math
 
 import lim_lee_exp_enhanced
 import affine
@@ -33,6 +34,7 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
         )
         cls.lookup_tables = {}
         cls.found_a_b = {}
+        # Default g, can be override.
         cls.g = AffinePoint(
             5500766647459515102121415383197930788461736082075939483175604378292091762735188389021373228733371700982189946675896443112885738755855474011198072400052059706,
             6196571742070369322997582767211672375614301062212534189301819527848804545012910190274143921663775158543034687203084223424923750245576983362405754170065531174,
@@ -45,56 +47,57 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
             ] = lim_lee_exp_enhanced.build_lookup_table(cls.g, R_bits, a, b)
             cls.found_a_b[(R_bits, S_max)] = (a, b)
 
-    def test_works_for_storage_size_R_bits_256_s_max_100(self):
-        # Arrange.
-        R = 2767201098028965716409203771940239753707949971455379335681895958567502012410
-        a, b = self.found_a_b[(256, 100)]
-        precomputed_G = self.lookup_tables[(256, 100)]
-        R_real = self.g * R
+    def assert_works_for(self, R, R_bits, S_max, g=None):
+        g = g or self.g
+        real_bits = math.log(R, 2)
+        assert real_bits <= R_bits, (
+            f"R should have at most {R_bits} bits, " f"but has {real_bits}."
+        )
+        a, b = self.found_a_b[(R_bits, S_max)]
+        precomputed_G = self.lookup_tables[(R_bits, S_max)]
+        R_real = g * R
 
         # Act.
         R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(
-            base=self.g, exp=R, a=a, b=b, precomputed_G=precomputed_G,
+            base=g, exp=R, a=a, b=b, precomputed_G=precomputed_G,
         )
 
         # Assert.
         assert (
             R_output == R_real
         ), f"Calculated R_output = {R_output} should be equal to real g * R = {R_real}"
+
+    def test_works_for_storage_size_R_bits_256_s_max_100(self):
+        # Arrange.
+        self.assert_works_for(
+            R=2767201098028965716409203771940239753707949971455379335681895958567502012410,
+            R_bits=256,
+            S_max=100,
+        )
 
     def test_works_for_storage_size_R_bits_256_s_max_500(self):
         # Arrange.
-        R = 2767201098028965716409203771940239753707949971455379335681895958567502012410
-        a, b = self.found_a_b[(256, 500)]
-        precomputed_G = self.lookup_tables[(256, 500)]
-        R_real = self.g * R
-
-        # Act.
-        R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(
-            base=self.g, exp=R, a=a, b=b, precomputed_G=precomputed_G,
+        self.assert_works_for(
+            R=2767201098028965716409203771940239753707949971455379335681895958567502012410,
+            R_bits=256,
+            S_max=500,
         )
-
-        # Assert.
-        assert (
-            R_output == R_real
-        ), f"Calculated R_output = {R_output} should be equal to real g * R = {R_real}"
 
     def test_works_for_storage_size_R_bits_150_s_max_500(self):
         # Arrange.
-        R = 1234
-        a, b = self.found_a_b[(150, 500)]
-        precomputed_G = self.lookup_tables[(150, 500)]
-        R_real = self.g * R
-
-        # Act.
-        R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(
-            base=self.g, exp=R, a=a, b=b, precomputed_G=precomputed_G,
+        self.assert_works_for(
+            R=1234, R_bits=150, S_max=500,
         )
 
-        # Assert.
-        assert (
-            R_output == R_real
-        ), f"Calculated R_output = {R_output} should be equal to real g * R = {R_real}"
+    def test_works_for_storage_size_R_bits_150_s_max_500_2(self):
+        # Arrange.
+        g = AffinePoint(336972847628, 312067054078)
+        R = 1269975484272894765069569234886311445905563823
+        
+        # Act and assert.
+        self.assert_works_for(
+            R=R, R_bits=150, S_max=500, g=g,
+        )
 
 
 if __name__ == "__main__":
