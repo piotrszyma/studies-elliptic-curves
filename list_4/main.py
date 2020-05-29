@@ -1,4 +1,5 @@
 import argparse
+import pickle
 
 import affine
 import field
@@ -10,6 +11,11 @@ AffinePoint = affine.AffinePoint
 FieldInt = field.FieldInt
 
 
+def _read_precomputed_lookups(path):
+    with open(path, "rb") as f:
+        return pickle.load(f)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", type=int)
@@ -19,17 +25,18 @@ def parse_args():
     parser.add_argument("--stdin", action="store_true", default=False)
     parser.add_argument("--path", type=str, default="params_40.json")
     parser.add_argument("--enhanced", action="store_true", default=False)
-    parser.add_argument("--gx", type=int, required=True, help='x of base AffinePoint')
-    parser.add_argument("--gy", type=int, required=True, help='y of base AffinePoint')
+    parser.add_argument("--gx", type=int, required=True, help="x of base AffinePoint")
+    parser.add_argument("--gy", type=int, required=True, help="y of base AffinePoint")
     parser.add_argument(
-        "--R", type=int, required=True, help='Value by which to multiply affine point')
+        "--R", type=int, required=True, help="Value by which to multiply affine point"
+    )
 
     parser.add_argument(
         "--lookups-path", type=str, help="If not provided, will calculate lookups."
     )
     return parser.parse_args()
 
-
+# python3 lookup_table_builder.py -a 185 -b 47 --gx 336972847628 --gy 312067054078 --num-bits 40
 # python3 main.py -a 185 -b 47 --path params_40.json --enhanced --gx 336972847628 --gy 312067054078 --R 1150191622
 def main():
     args = parse_args()
@@ -45,7 +52,13 @@ def main():
     R = FieldInt(value=args.R)
 
     if args.enhanced:
-        R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(g, R, args.a, args.b)
+        if args.lookups_path:
+            precomputed_G = _read_precomputed_lookups(args.lookups_path)
+        else:
+            precomputed_G = None
+        R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(
+            g, R, args.a, args.b, precomputed_G=precomputed_G,
+        )
     else:
         v = args.v  # in the paper denoted as "v"
         h = args.u

@@ -81,12 +81,12 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
                     pass
 
             if I_j_k == 0:
-                print("Warning, I_j_k returned 0...")
+                # print("Warning, I_j_k returned 0...")
                 continue
 
             try:
                 R_output = R_output + G[j][I_j_k]
-            except:
+            except IndexError:
                 pass
     return R_output
 
