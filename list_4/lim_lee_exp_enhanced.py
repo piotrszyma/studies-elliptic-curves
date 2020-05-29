@@ -60,7 +60,6 @@ def build_lookup_table(g, num_bits, a, b):
 
     return G
 
-
 def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
     R = exp
     # Generate chunks of chunks.
