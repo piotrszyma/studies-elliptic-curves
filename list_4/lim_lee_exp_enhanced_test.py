@@ -29,10 +29,14 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
         params = (
             (256, 100),
             (256, 500),
+            (150, 500),
         )
         cls.lookup_tables = {}
         cls.found_a_b = {}
-        cls.g = AffinePoint(178539744208, 550836080620)
+        cls.g = AffinePoint(
+            5500766647459515102121415383197930788461736082075939483175604378292091762735188389021373228733371700982189946675896443112885738755855474011198072400052059706,
+            6196571742070369322997582767211672375614301062212534189301819527848804545012910190274143921663775158543034687203084223424923750245576983362405754170065531174,
+        )
 
         for R_bits, S_max in params:
             a, b = lim_lee_exp_enhanced.optimize_parameters(R_bits=R_bits, S_max=S_max)
@@ -63,6 +67,23 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
         R = 2767201098028965716409203771940239753707949971455379335681895958567502012410
         a, b = self.found_a_b[(256, 500)]
         precomputed_G = self.lookup_tables[(256, 500)]
+        R_real = self.g * R
+
+        # Act.
+        R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(
+            base=self.g, exp=R, a=a, b=b, precomputed_G=precomputed_G,
+        )
+
+        # Assert.
+        assert (
+            R_output == R_real
+        ), f"Calculated R_output = {R_output} should be equal to real g * R = {R_real}"
+
+    def test_works_for_storage_size_R_bits_150_s_max_500(self):
+        # Arrange.
+        R = 1234
+        a, b = self.found_a_b[(150, 500)]
+        precomputed_G = self.lookup_tables[(150, 500)]
         R_real = self.g * R
 
         # Act.
