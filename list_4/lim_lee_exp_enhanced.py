@@ -22,6 +22,13 @@ def split_str(num_str, n_of_chunks):
 
 
 def build_lookup_table(g, num_bits, a, b):
+    print(f"""
+    Building lookup table for
+    g: {g}
+    num_bits: {num_bits}
+    a: {a}
+    b: {b}
+    """)
     h, v, a_last, v_last, b_last = compute_parameters(num_bits, a, b)
 
     # Prepare list of g_i.

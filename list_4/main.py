@@ -47,6 +47,11 @@ def parse_args():
 # For calculating using lookups table (with --lookups-path argument)
 # python3 main.py -a 185 -b 47 --path params_40.json --enhanced --gx 336972847628 --gy 312067054078 --R 1150191622 --lookups-path lookup_table.pkl
 
+# between 149 - 150 bits
+# -a 22 -b 6
+# --gx 336972847628 --gy 312067054078
+# --R 1269975484272894765069569234886311445905563823
+
 
 def main():
     args = parse_args()
