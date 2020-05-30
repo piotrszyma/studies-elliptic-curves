@@ -1,6 +1,7 @@
 import collections
 import unittest
 import math
+import random
 
 import lim_lee_exp_enhanced
 import affine
@@ -84,7 +85,7 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
     def test_works_for_storage_size_R_bits_256_s_max_500(self):
         # Arrange.
         self.assert_works_for(
-            R=2767201098028965716409203771940239753707949971455379335681895958567502012410,
+            R=random.getrandbits(256),
             R_bits=256,
             S_max=500,
         )
@@ -97,14 +98,15 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
 
     def test_works_for_storage_size_R_bits_150_s_max_500_2(self):
         # Arrange.
-        g = AffinePoint(336972847628, 312067054078)
-        R = 1269975484272894765069569234886311445905563823
+        g = AffinePoint.random()
+        R = random.getrandbits(150)
 
         # Act and assert.
         self.assert_works_for(
-            R=R, R_bits=150, S_max=500, g=g,
+            R=R, R_bits=150, S_max=500
         )
 
 
 if __name__ == "__main__":
     unittest.main()
+    
