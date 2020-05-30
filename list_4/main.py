@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument("-a", type=int)
     parser.add_argument("-b", type=int)
     parser.add_argument("--stdin", action="store_true", default=False)
-    parser.add_argument("--path", type=str, default="params_40.json")
+    parser.add_argument("--path", type=str)
     parser.add_argument("--enhanced", action="store_true", default=False)
     parser.add_argument("--gx", type=int, required=True, help="x of base AffinePoint")
     parser.add_argument("--gy", type=int, required=True, help="y of base AffinePoint")
