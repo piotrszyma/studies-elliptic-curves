@@ -77,10 +77,8 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
     G = precomputed_G if precomputed_G else build_lookup_table(base, R_bits, a, b)
 
     chunks_str = split_str(R_str, a)
-    # chunks_str[-1] = chunks_str[-1][-a_last:]
 
     chunks_of_chunks_str = [split_str(chunk_str, b) for chunk_str in chunks_str]
-    # chunks_of_chunks_str.append(split_str(chunks_str[-1], v_last))
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
