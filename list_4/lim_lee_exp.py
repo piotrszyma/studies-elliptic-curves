@@ -19,6 +19,48 @@ def split_str(num_str, bits_in_chunk):
     return splitted[::-1]
 
 
+def build_lookup_table(g, num_bits, a, b):
+    print(
+        f"""
+    Building lookup table for
+    g: {g}
+    num_bits: {num_bits}
+    a: {a}
+    b: {b}
+    """
+    )
+
+    h = math.ceil(num_bits / a)
+    v = math.ceil(a / b)
+    g_list = [g * (2 ** (i * a)) for i in range(h)]
+
+    # Generate G two dim table.
+    G = {idx: {} for idx in range(v)}
+
+    # Calculate G[0][u] for 0 < u < 2**h
+    for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
+        u_bits = bin(u)[2:].zfill(h)
+        r_bits = g_list[::-1]
+        muls = [r for u, r in zip(u_bits, r_bits) if u == "1"]
+        G[0][u] = AffinePoint.get_infinity()
+        for mul in muls:
+            G[0][u] += mul
+
+    assert len(G[0]) == len(range(1, 2 ** h))
+
+    # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
+    for j in range(1, v):
+        exponent = 2 ** (j * b)
+        for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
+            G[j][u] = G[0][u] * exponent
+
+    lookup_table_size = sum(len(row) for row in G.values())
+
+    print(f"Look-up table size: {lookup_table_size}")
+
+    return G
+
+
 def lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks):
     g = base
     R = exp
@@ -44,31 +86,12 @@ b: {b}
 
     R_str = bin(R)[2:]
 
-    chunks_str = split_str(R_str, a)
-    chunks_of_chunks_str = [split_str(chunk_str, b) for chunk_str in chunks_str]
+    chunks_of_chunks_str = [
+        split_str(chunk_str, b) for chunk_str in split_str(R_str, a)
+    ]
 
-    # Prepare list of g_i.
-    g_list = [g * (2 ** (i * a)) for i in range(h)]
-
-    # Generate G two dim table.
-    G = {idx: {} for idx in range(v)}
-
-    # Calculate G[0][u] for 0 < u < 2**h
-    for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
-        u_bits = bin(u)[2:].zfill(h)
-        r_bits = g_list[::-1]
-        muls = [r for u, r in zip(u_bits, r_bits) if u == "1"]
-        G[0][u] = AffinePoint.get_infinity()
-        for mul in muls:
-            G[0][u] += mul
-
-    assert len(G[0]) == len(range(1, 2 ** h))
-
-    # Calculate G[j][u] for j in 0 < j < v and u in 0 < u < 2**h
-    for j in range(1, v):
-        exponent = 2 ** (j * b)
-        for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
-            G[j][u] = G[0][u] * exponent
+    # Generate lookup table.
+    G = build_lookup_table(g, R_bits, a, b)
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
@@ -109,4 +132,5 @@ if __name__ == "__main__":
     result = lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks)
 
     expected = base * exp
-    assert result == expected
+    assert result == expected, "Failed to calculate."
+    print("Calculated.")
