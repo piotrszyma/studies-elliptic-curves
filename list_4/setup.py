@@ -2,6 +2,7 @@ import json
 import shared
 
 import affine
+import projective
 import field
 
 
@@ -32,4 +33,5 @@ def set_curve_params(args):
         curve_order=curve_order,
     )
     affine.set_curve_params(curve_params)
+    projective.set_curve_params(curve_params)
     field.set_modulus(field_order)

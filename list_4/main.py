@@ -23,14 +23,13 @@ def parse_args():
     parser.add_argument("-a", type=int)
     parser.add_argument("-b", type=int)
     parser.add_argument("--stdin", action="store_true", default=False)
-    parser.add_argument("--path", type=str)
+    parser.add_argument("--path", type=str, required=True)
     parser.add_argument("--enhanced", action="store_true", default=False)
-    parser.add_argument("--gx", type=int, required=True, help="x of base AffinePoint")
-    parser.add_argument("--gy", type=int, required=True, help="y of base AffinePoint")
+    parser.add_argument("--gx", type=int, required=True, help="x of base Point")
+    parser.add_argument("--gy", type=int, required=True, help="y of base Point")
     parser.add_argument(
         "--R", type=int, required=True, help="Value by which to multiply affine point"
     )
-
     parser.add_argument(
         "--lookups-path", type=str, help="If not provided, will calculate lookups."
     )
@@ -72,7 +71,7 @@ def main():
 
     # -    g = AffinePoint(336972847628, 312067054078)
     # -    R = FieldInt(value=1150191622)
-    g = AffinePoint(args.gx, args.gy)
+    g = AffinePoint(args.gx, args.gy).convert_to_projective_point()
     R = FieldInt(value=args.R)
 
     if args.enhanced:

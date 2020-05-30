@@ -2,13 +2,14 @@ from tqdm import tqdm
 
 import math
 import affine
+import projective
 import field
 import utils
-from affine import set_curve_params
 from shared import CurveBasePoint, CurveParams
 
 
 AffinePoint = affine.AffinePoint
+ProjectivePoint = projective.ProjectivePoint
 FieldInt = field.FieldInt
 IntWithBinIndex = utils.IntWithBinIndex
 
@@ -41,22 +42,22 @@ def build_lookup_table(g, num_bits, a, b):
     G = {idx: {} for idx in range(v)}
 
     # Calculate G[0][u] for 0 < u < 2**h
-    for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
+    for u in tqdm(range(1, 2 ** h)):  # u from 1 to (2 ** h - 1)
         u_bits = bin(u)[2:].zfill(h)
         r_bits = g_list[::-1]
         muls = [r for u, r in zip(u_bits, r_bits) if u == "1"]
-        G[0][u] = AffinePoint.get_infinity()
+        G[0][u] = ProjectivePoint.get_infinity()
         for mul in muls:
             G[0][u] += mul
 
     assert len(G[0]) == len(range(1, 2 ** h))
 
-    for j in range(1, v_last):
+    for j in tqdm(range(1, v_last)):
         exponent = 2 ** (j * b)
         for u in range(1, 2 ** h):  # u from 1 to (2 ** h - 1)
             G[j][u] = G[0][u] * exponent
 
-    for j in range(0, v - v_last):
+    for j in tqdm(range(0, v - v_last)):
         exponent = 2 ** ((v_last + j) * b)
         for u in range(1, 2 ** (h - 1)):
             G[v_last + j][u] = G[0][u] * exponent
@@ -81,13 +82,13 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
     chunks_of_chunks_str = [split_str(chunk_str, b) for chunk_str in chunks_str]
 
     # Exponentation
-    R_output = AffinePoint.get_infinity()
-    # no_of_additions = 0
-    # no_of_mutliplications = 0
+    R_output = ProjectivePoint.get_infinity()
+    no_of_additions = 0
+    no_of_mutliplications = 0
 
     for k in range(b):
         R_output = R_output * 2
-        # no_of_mutliplications += 1
+        no_of_mutliplications += 1
         for j in range(v):
             I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
 
@@ -95,10 +96,10 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
                 continue
 
             R_output = R_output + G[j][I_j_k]
-            # no_of_additions += 1
+            no_of_additions += 1
 
-    # print(f"# of Additions: {no_of_additions}")
-    # print(f"# of Multiplications: {no_of_mutliplications}")
+    print(f"# of Additions: {no_of_additions}")
+    print(f"# of Multiplications: {no_of_mutliplications}")
     return R_output
 
 
@@ -164,12 +165,14 @@ if __name__ == "__main__":
         curve_order=6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449,
         field_order=6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
     )
-    set_curve_params(curve_params)
+    affine.set_curve_params(curve_params)
+    projective.set_curve_params(curve_params)
     field.set_modulus(curve_params.field_order)
     base = AffinePoint(
         5500766647459515102121415383197930788461736082075939483175604378292091762735188389021373228733371700982189946675896443112885738755855474011198072400052059706,
         6196571742070369322997582767211672375614301062212534189301819527848804545012910190274143921663775158543034687203084223424923750245576983362405754170065531174,
     )
+    # base = base.convert_to_projective_point()
     exp = 2767201098028965716409203771940239753707949971455379335681895958567502012410
 
     a = 26

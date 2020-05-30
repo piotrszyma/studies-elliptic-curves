@@ -5,8 +5,8 @@ import random
 
 import lim_lee_exp_enhanced
 import affine
+import projective
 import field
-from affine import set_curve_params
 from shared import CurveBasePoint, CurveParams
 
 AffinePoint = affine.AffinePoint
@@ -26,7 +26,8 @@ def _setup_curve():
         curve_order=6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449,
         field_order=6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
     )
-    set_curve_params(curve_params)
+    affine.set_curve_params(curve_params)
+    projective.set_curve_params(curve_params)
     field.set_modulus(curve_params.field_order)
 
 
@@ -46,7 +47,7 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
         cls.g = AffinePoint(
             5500766647459515102121415383197930788461736082075939483175604378292091762735188389021373228733371700982189946675896443112885738755855474011198072400052059706,
             6196571742070369322997582767211672375614301062212534189301819527848804545012910190274143921663775158543034687203084223424923750245576983362405754170065531174,
-        )
+        ).convert_to_projective_point()
 
         for R_bits, S_max in precomputations_to_make:
             a, b = lim_lee_exp_enhanced.optimize_parameters(R_bits=R_bits, S_max=S_max)
