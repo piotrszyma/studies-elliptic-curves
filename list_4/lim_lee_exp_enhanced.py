@@ -4,20 +4,21 @@ import math
 import affine
 import field
 import utils
+from affine import set_curve_params
+from shared import CurveBasePoint, CurveParams
+
 
 AffinePoint = affine.AffinePoint
 FieldInt = field.FieldInt
 IntWithBinIndex = utils.IntWithBinIndex
 
 
-def split_str(num_str, n_of_chunks):
-    lpad = (math.ceil(len(num_str) / n_of_chunks) * n_of_chunks) - len(num_str)
-    num_str = "0" * lpad + num_str
-    chunk_size = len(num_str) // n_of_chunks
-
+def split_str(num_str, bits_in_chunk):
+    rfilled_size = math.ceil(len(num_str) / bits_in_chunk) * bits_in_chunk
+    num_str = num_str.zfill(rfilled_size)
     splitted = []
-    for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx : idx + chunk_size])
+    for idx in range(0, len(num_str), bits_in_chunk):
+        splitted.append(num_str[idx : idx + bits_in_chunk])
     return splitted[::-1]
 
 
@@ -75,38 +76,28 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
     h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
     G = precomputed_G if precomputed_G else build_lookup_table(base, R_bits, a, b)
 
-    chunks_str = split_str(R_str, h)
-    chunks_str[-1] = chunks_str[-1][-a_last:]
+    chunks_str = split_str(R_str, a)
+    # chunks_str[-1] = chunks_str[-1][-a_last:]
 
-    chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str[:-1]]
-    chunks_of_chunks_str.append(split_str(chunks_str[-1], v_last))
+    chunks_of_chunks_str = [split_str(chunk_str, b) for chunk_str in chunks_str]
+    # chunks_of_chunks_str.append(split_str(chunks_str[-1], v_last))
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
     no_of_additions = 0
     no_of_mutliplications = 0
 
-    for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
+    for k in range(b):
         R_output = R_output * 2
         no_of_mutliplications += 1
-        for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
-            I_j_k = 0
-            for i in range(h):
-                try:
-                    I_j_k += int(chunks_of_chunks_str[i][j][::-1][k]) * (2 ** i)
-                except IndexError:
-                    pass
+        for j in range(v):
+            I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
 
             if I_j_k == 0:
-                # print("Warning, I_j_k returned 0...")
                 continue
 
-            try:
-                R_output = R_output + G[j][I_j_k]
-            except IndexError:
-                pass
-            else:
-                no_of_additions += 1
+            R_output = R_output + G[j][I_j_k]
+            no_of_additions += 1
 
     print(f"# of Additions: {no_of_additions}")
     print(f"# of Multiplications: {no_of_mutliplications}")
@@ -161,3 +152,32 @@ def compute_number_of_operations(a, b, a_last, h):
 
 def compute_storage_requirement(h, v, v_last):
     return (2 ** h - 1) * v_last + (2 ** (h - 1) - 1) * (v - v_last)
+
+
+if __name__ == "__main__":
+    curve_params = CurveParams(
+        base_point=CurveBasePoint(
+            x=2661740802050217063228768716723360960729859168756973147706671368418802944996427808491545080627771902352094241225065558662157113545570916814161637315895999846,
+            y=3757180025770020463545507224491183603594455134769762486694567779615544477440556316691234405012945539562144444537289428522585666729196580810124344277578376784,
+            z=1,
+        ),
+        a=-3,
+        b=1093849038073734274511112390766805569936207598951683748994586394495953116150735016013708737573759623248592132296706313309438452531591012912142327488478985984,
+        curve_order=6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449,
+        field_order=6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
+    )
+    set_curve_params(curve_params)
+    field.set_modulus(curve_params.field_order)
+    base = AffinePoint(
+        5500766647459515102121415383197930788461736082075939483175604378292091762735188389021373228733371700982189946675896443112885738755855474011198072400052059706,
+        6196571742070369322997582767211672375614301062212534189301819527848804545012910190274143921663775158543034687203084223424923750245576983362405754170065531174,
+    )
+    exp = 2767201098028965716409203771940239753707949971455379335681895958567502012410
+
+    a = 26
+    b = 6
+    result = lim_lee_exp_enhanced(base, exp, a, b)
+
+    expected = base * exp
+    assert result == expected, "Failed to calculate."
+    print("Calculated.")
