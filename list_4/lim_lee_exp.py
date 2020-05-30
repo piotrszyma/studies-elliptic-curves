@@ -10,14 +10,12 @@ FieldInt = field.FieldInt
 IntWithBinIndex = utils.IntWithBinIndex
 
 
-def split_str(num_str, n_of_chunks):
-    lpad = (math.ceil(len(num_str) / n_of_chunks) * n_of_chunks) - len(num_str)
-    num_str = "0" * lpad + num_str
-    chunk_size = len(num_str) // n_of_chunks
-
+def split_str(num_str, bits_in_chunk):
+    rfilled_size = math.ceil(len(num_str) / bits_in_chunk) * bits_in_chunk
+    num_str = num_str.zfill(rfilled_size)
     splitted = []
-    for idx in range(0, len(num_str), chunk_size):
-        splitted.append(num_str[idx : idx + chunk_size])
+    for idx in range(0, len(num_str), bits_in_chunk):
+        splitted.append(num_str[idx : idx + bits_in_chunk])
     return splitted[::-1]
 
 
@@ -46,18 +44,8 @@ b: {b}
 
     R_str = bin(R)[2:]
 
-    chunks_str = split_str(R_str, h)
-    chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str]
-
-    chunks = [int(e, base=2) for e in chunks_str]
-    chunks_of_chunks = []
-    for chunk_str in chunks_of_chunks_str:
-        chunks_of_chunks.append([int(e, base=2) for e in chunk_str])
-
-    assert len(chunks) == h
-    assert R == sum(e_i * (2 ** (i * a)) for i, e_i in enumerate(chunks))
-    for i, chunk in enumerate(chunks):
-        assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
+    chunks_str = split_str(R_str, a)
+    chunks_of_chunks_str = [split_str(chunk_str, b) for chunk_str in chunks_str]
 
     # Prepare list of g_i.
     g_list = [g * (2 ** (i * a)) for i in range(h)]
@@ -84,16 +72,14 @@ b: {b}
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
-    for k in range(b - 1, -1, -1):  # k from b - 1 down to 0
+    for k in range(b):  # k from b - 1 down to 0
         R_output = R_output * 2
-        for j in range(v - 1, -1, -1):  # j from v - 1 down to 0
-            I_j_k = sum(
-                int(chunks_of_chunks_str[i][j][::-1][k]) * (2 ** i) for i in range(h)
-            )
+        for j in range(v):  # j from v - 1 down to 0
+            I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
 
             if I_j_k == 0:
-                print("Warning, I_j_k returned 0...")
                 continue
+
             R_output = R_output + G[j][I_j_k]
 
     return R_output
@@ -117,9 +103,7 @@ if __name__ == "__main__":
         5500766647459515102121415383197930788461736082075939483175604378292091762735188389021373228733371700982189946675896443112885738755855474011198072400052059706,
         6196571742070369322997582767211672375614301062212534189301819527848804545012910190274143921663775158543034687203084223424923750245576983362405754170065531174,
     )
-    exp = (
-        2767201098028965716409203771940239753707949971455379335681895958567502012410
-    )
+    exp = 2767201098028965716409203771940239753707949971455379335681895958567502012410
     num_of_chunks = 10
     num_of_subchunks = 5
     result = lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks)
