@@ -37,6 +37,7 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
         precomputations_to_make = (
             PrecomputationCase(R_bits=256, S_max=100),
             PrecomputationCase(R_bits=256, S_max=500),
+            PrecomputationCase(R_bits=256, S_max=5000),
             PrecomputationCase(R_bits=150, S_max=500),
         )
         cls.lookup_tables = {}
@@ -102,6 +103,16 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
                 # Act and assert.
                 self.assert_works_for(
                     R=R, R_bits=150, S_max=500,
+                )
+
+    def test_works_for_storage_size_R_bits_256_s_max_5000(self):
+        # Arrange.
+        for _ in range(10):
+            R = random.getrandbits(256)
+            with self.subTest(R):
+                # Act and assert.
+                self.assert_works_for(
+                    R=R, R_bits=256, S_max=5000,
                 )
 
 
