@@ -72,9 +72,9 @@ b: {b}
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
-    for k in range(b):  # k from b - 1 down to 0
+    for k in range(b):
         R_output = R_output * 2
-        for j in range(v):  # j from v - 1 down to 0
+        for j in range(v):
             I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
 
             if I_j_k == 0:
