@@ -2,6 +2,8 @@ import math
 import affine
 import field
 import utils
+from affine import set_curve_params
+from shared import CurveBasePoint, CurveParams
 
 AffinePoint = affine.AffinePoint
 FieldInt = field.FieldInt
@@ -47,15 +49,15 @@ b: {b}
     chunks_str = split_str(R_str, h)
     chunks_of_chunks_str = [split_str(chunk_str, v) for chunk_str in chunks_str]
 
-    # chunks = [int(e, base=2) for e in chunks_str]
-    # chunks_of_chunks = []
-    # for chunk_str in chunks_of_chunks_str:
-    #     chunks_of_chunks.append([int(e, base=2) for e in chunk_str])
+    chunks = [int(e, base=2) for e in chunks_str]
+    chunks_of_chunks = []
+    for chunk_str in chunks_of_chunks_str:
+        chunks_of_chunks.append([int(e, base=2) for e in chunk_str])
 
-    # assert len(chunks) == h
-    # assert R == sum(e_i * (2 ** (i * a)) for i, e_i in enumerate(chunks))
-    # for i, chunk in enumerate(chunks):
-    #     assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
+    assert len(chunks) == h
+    assert R == sum(e_i * (2 ** (i * a)) for i, e_i in enumerate(chunks))
+    for i, chunk in enumerate(chunks):
+        assert chunk == sum(chunks_of_chunks[i][j] * (2 ** (j * b)) for j in range(v))
 
     # Prepare list of g_i.
     g_list = [g * (2 ** (i * a)) for i in range(h)]
@@ -95,3 +97,32 @@ b: {b}
             R_output = R_output + G[j][I_j_k]
 
     return R_output
+
+
+if __name__ == "__main__":
+    curve_params = CurveParams(
+        base_point=CurveBasePoint(
+            x=2661740802050217063228768716723360960729859168756973147706671368418802944996427808491545080627771902352094241225065558662157113545570916814161637315895999846,
+            y=3757180025770020463545507224491183603594455134769762486694567779615544477440556316691234405012945539562144444537289428522585666729196580810124344277578376784,
+            z=1,
+        ),
+        a=-3,
+        b=1093849038073734274511112390766805569936207598951683748994586394495953116150735016013708737573759623248592132296706313309438452531591012912142327488478985984,
+        curve_order=6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449,
+        field_order=6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
+    )
+    set_curve_params(curve_params)
+    field.set_modulus(curve_params.field_order)
+    base = AffinePoint(
+        5500766647459515102121415383197930788461736082075939483175604378292091762735188389021373228733371700982189946675896443112885738755855474011198072400052059706,
+        6196571742070369322997582767211672375614301062212534189301819527848804545012910190274143921663775158543034687203084223424923750245576983362405754170065531174,
+    )
+    exp = (
+        2767201098028965716409203771940239753707949971455379335681895958567502012410
+    )
+    num_of_chunks = 10
+    num_of_subchunks = 5
+    result = lim_lee_exp(base, exp, num_of_chunks, num_of_subchunks)
+
+    expected = base * exp
+    assert result == expected
