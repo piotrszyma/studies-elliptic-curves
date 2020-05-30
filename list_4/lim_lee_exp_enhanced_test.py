@@ -56,19 +56,18 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
             ] = lim_lee_exp_enhanced.build_lookup_table(cls.g, R_bits, a, b)
             cls.found_a_b[(R_bits, S_max)] = (a, b)
 
-    def assert_works_for(self, R, R_bits, S_max, g=None):
-        g = g or self.g
+    def assert_works_for(self, R, R_bits, S_max):
         real_bits = math.log(R, 2)
         assert real_bits <= R_bits, (
             f"R should have at most {R_bits} bits, " f"but has {real_bits}."
         )
         a, b = self.found_a_b[(R_bits, S_max)]
         precomputed_G = self.lookup_tables[(R_bits, S_max)]
-        R_real = g * R
+        R_real = self.g * R
 
         # Act.
         R_output = lim_lee_exp_enhanced.lim_lee_exp_enhanced(
-            base=g, exp=R, a=a, b=b, precomputed_G=precomputed_G,
+            base=self.g, exp=R, a=a, b=b, precomputed_G=precomputed_G,
         )
 
         # Assert.
@@ -76,46 +75,27 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
             R_output == R_real
         ), f"Calculated R_output = {R_output} should be equal to real g * R = {R_real}"
 
-    def test_works_for_storage_size_R_bits_256_s_max_100(self):
-        # Arrange.
-        for _ in range(10):
-            R = random.getrandbits(150)
+    def assert_fuzzy_works_for(self, R_bits, S_max, n_runs=10):
+        print(f'\nRunning {n_runs} times for R_bits = {R_bits} and S_max = {S_max}')
+        for _ in range(n_runs):
+            R = random.getrandbits(R_bits)
             with self.subTest(R):
                 # Act and assert.
                 self.assert_works_for(
-                    R=R, R_bits=256, S_max=100,
+                    R=R, R_bits=R_bits, S_max=S_max,
                 )
+
+    def test_works_for_storage_size_R_bits_256_s_max_100(self):
+        self.assert_fuzzy_works_for(R_bits=256, S_max=100)
 
     def test_works_for_storage_size_R_bits_256_s_max_500(self):
-        # Arrange.
-        for _ in range(10):
-            R = random.getrandbits(150)
-            with self.subTest(R):
-                # Act and assert.
-                self.assert_works_for(
-                    R=R, R_bits=256, S_max=500,
-                )
+        self.assert_fuzzy_works_for(R_bits=256, S_max=500)
 
     def test_works_for_storage_size_R_bits_150_s_max_500(self):
-        # Arrange.
-        for _ in range(10):
-            R = random.getrandbits(150)
-            with self.subTest(R):
-                # Act and assert.
-                self.assert_works_for(
-                    R=R, R_bits=150, S_max=500,
-                )
+        self.assert_fuzzy_works_for(R_bits=150, S_max=500)
 
     def test_works_for_storage_size_R_bits_256_s_max_5000(self):
-        # Arrange.
-        for _ in range(10):
-            R = random.getrandbits(256)
-            with self.subTest(R):
-                # Act and assert.
-                self.assert_works_for(
-                    R=R, R_bits=256, S_max=5000,
-                )
-
+        self.assert_fuzzy_works_for(R_bits=256, S_max=5000)
 
 if __name__ == "__main__":
     unittest.main()
