@@ -82,12 +82,12 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
-    no_of_additions = 0
-    no_of_mutliplications = 0
+    # no_of_additions = 0
+    # no_of_mutliplications = 0
 
     for k in range(b):
         R_output = R_output * 2
-        no_of_mutliplications += 1
+        # no_of_mutliplications += 1
         for j in range(v):
             I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
 
@@ -95,10 +95,10 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
                 continue
 
             R_output = R_output + G[j][I_j_k]
-            no_of_additions += 1
+            # no_of_additions += 1
 
-    print(f"# of Additions: {no_of_additions}")
-    print(f"# of Multiplications: {no_of_mutliplications}")
+    # print(f"# of Additions: {no_of_additions}")
+    # print(f"# of Multiplications: {no_of_mutliplications}")
     return R_output
 
 

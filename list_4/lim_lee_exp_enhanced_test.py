@@ -76,37 +76,34 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
 
     def test_works_for_storage_size_R_bits_256_s_max_100(self):
         # Arrange.
-        self.assert_works_for(
-            R=2767201098028965716409203771940239753707949971455379335681895958567502012410,
-            R_bits=256,
-            S_max=100,
-        )
+        for _ in range(10):
+            R = random.getrandbits(150)
+            with self.subTest(R):
+                # Act and assert.
+                self.assert_works_for(
+                    R=R, R_bits=256, S_max=100,
+                )
 
     def test_works_for_storage_size_R_bits_256_s_max_500(self):
         # Arrange.
-        self.assert_works_for(
-            R=random.getrandbits(256),
-            R_bits=256,
-            S_max=500,
-        )
+        for _ in range(10):
+            R = random.getrandbits(150)
+            with self.subTest(R):
+                # Act and assert.
+                self.assert_works_for(
+                    R=R, R_bits=256, S_max=500,
+                )
 
     def test_works_for_storage_size_R_bits_150_s_max_500(self):
         # Arrange.
-        self.assert_works_for(
-            R=1234, R_bits=150, S_max=500,
-        )
-
-    def test_works_for_storage_size_R_bits_150_s_max_500_2(self):
-        # Arrange.
-        g = AffinePoint.random()
-        R = random.getrandbits(150)
-
-        # Act and assert.
-        self.assert_works_for(
-            R=R, R_bits=150, S_max=500
-        )
+        for _ in range(10):
+            R = random.getrandbits(150)
+            with self.subTest(R):
+                # Act and assert.
+                self.assert_works_for(
+                    R=R, R_bits=150, S_max=500,
+                )
 
 
 if __name__ == "__main__":
     unittest.main()
-    
