@@ -94,10 +94,10 @@ b: {b}
     no_of_mutliplications = 0
     
     # Generate lookup table.
-    start = time.time()
     G = build_lookup_table(g, R_bits, a, b)
 
     # Exponentation
+    start = time.time()
     R_output = AffinePoint.get_infinity()
     for k in range(b):
         R_output = R_output * 2
@@ -110,6 +110,7 @@ b: {b}
 
             R_output = R_output + G[j][I_j_k]
             no_of_additions += 1
+
     print(f"Baseline duration: {time.time() - start}")
     print(f"# of Additions: {no_of_additions}")
     print(f"# of Multiplications: {no_of_mutliplications}")

@@ -76,13 +76,13 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
     R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     R_str = bin(R)[2:]
     h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
-    start = time.time()
     G = precomputed_G if precomputed_G else build_lookup_table(base, R_bits, a, b)
 
     chunks_str = split_str(R_str, a)
 
     chunks_of_chunks_str = [split_str(chunk_str, b) for chunk_str in chunks_str]
     # Exponentation
+    start = time.time()
     R_output = ProjectivePoint.get_infinity()
     no_of_additions = 0
     no_of_mutliplications = 0
