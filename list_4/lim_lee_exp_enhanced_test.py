@@ -36,7 +36,7 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
     def setUpClass(cls):
         _setup_curve()
         precomputations_to_make = (
-            PrecomputationCase(R_bits=256, S_max=100),
+            PrecomputationCase(R_bits=512, S_max=100),
             PrecomputationCase(R_bits=256, S_max=500),
             PrecomputationCase(R_bits=256, S_max=5000),
             PrecomputationCase(R_bits=150, S_max=500),
@@ -86,7 +86,7 @@ class LimLeeExpEnhancedTests(unittest.TestCase):
                 )
 
     def test_works_for_storage_size_R_bits_256_s_max_100(self):
-        self.assert_fuzzy_works_for(R_bits=256, S_max=100)
+        self.assert_fuzzy_works_for(R_bits=512, S_max=100)
 
     def test_works_for_storage_size_R_bits_256_s_max_500(self):
         self.assert_fuzzy_works_for(R_bits=256, S_max=500)

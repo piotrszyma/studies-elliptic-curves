@@ -5,6 +5,7 @@ import affine
 import projective
 import field
 import utils
+import time
 from shared import CurveBasePoint, CurveParams
 
 
@@ -75,12 +76,12 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
     R_bits = math.ceil(math.log(R, 2))  # Number of bits of the exponent.
     R_str = bin(R)[2:]
     h, v, a_last, v_last, b_last = compute_parameters(R_bits, a, b)
+    start = time.time()
     G = precomputed_G if precomputed_G else build_lookup_table(base, R_bits, a, b)
 
     chunks_str = split_str(R_str, a)
 
     chunks_of_chunks_str = [split_str(chunk_str, b) for chunk_str in chunks_str]
-
     # Exponentation
     R_output = ProjectivePoint.get_infinity()
     no_of_additions = 0
@@ -97,7 +98,7 @@ def lim_lee_exp_enhanced(base, exp, a, b, precomputed_G=None):
 
             R_output = R_output + G[j][I_j_k]
             no_of_additions += 1
-
+    print(f"Enhanced duration: {time.time() - start}")
     print(f"# of Additions: {no_of_additions}")
     print(f"# of Multiplications: {no_of_mutliplications}")
     return R_output

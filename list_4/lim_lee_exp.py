@@ -2,6 +2,7 @@ import math
 import affine
 import field
 import utils
+import time
 from affine import set_curve_params
 from shared import CurveBasePoint, CurveParams
 
@@ -89,14 +90,18 @@ b: {b}
     chunks_of_chunks_str = [
         split_str(chunk_str, b) for chunk_str in split_str(R_str, a)
     ]
-
+    no_of_additions= 0
+    no_of_mutliplications = 0
+    
     # Generate lookup table.
+    start = time.time()
     G = build_lookup_table(g, R_bits, a, b)
 
     # Exponentation
     R_output = AffinePoint.get_infinity()
     for k in range(b):
         R_output = R_output * 2
+        no_of_mutliplications += 1
         for j in range(v):
             I_j_k = sum(int(chunks_of_chunks_str[i][j][k]) * (2 ** i) for i in range(h))
 
@@ -104,7 +109,11 @@ b: {b}
                 continue
 
             R_output = R_output + G[j][I_j_k]
-
+            no_of_additions += 1
+    print(f"Baseline duration: {time.time() - start}")
+    print(f"# of Additions: {no_of_additions}")
+    print(f"# of Multiplications: {no_of_mutliplications}")
+    
     return R_output
 
 
