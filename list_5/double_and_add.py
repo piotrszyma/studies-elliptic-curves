@@ -2,6 +2,7 @@ import argparse
 import random
 from field import FieldInt
 import projective
+import copy
 import setup
 
 ProjectivePoint = projective.ProjectivePoint
@@ -21,16 +22,20 @@ def main(args):
     # TODO: Calculate double-and-add method.
     result = double_and_add(base_point, k)
     print(result)
+    assert result == mul_point
 
 
-def double_and_add(point, scalar):
-    scalar = bin(scalar)[2:]
+def double_and_add(base_point, scalar):
     TWO = FieldInt(2)
-    result = point
-    for i in range(len(scalar)-1, -1, -1):
-        result = result * TWO
-        if scalar[i] == "1":
-            result += point
+    temp = copy.deepcopy(base_point)
+    result = ProjectivePoint.get_infinity()
+
+    while scalar != 0:
+        if scalar & 1 != 0:
+            result += temp
+        temp = temp * TWO
+        scalar >>= 1
+
     return result
 
 

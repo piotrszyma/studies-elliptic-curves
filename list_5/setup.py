@@ -3,6 +3,7 @@ import shared
 
 import projective
 import field
+import affine
 
 
 def _read_sage_params_from_file(file_path):
@@ -32,5 +33,6 @@ def set_curve_params(args):
         curve_order=curve_order,
     )
     projective.set_curve_params(curve_params)
+    affine.set_curve_params(curve_params)
     field.set_modulus(field_order)
     return curve_params, int(raw_json["bitLength"])
