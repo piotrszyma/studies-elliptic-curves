@@ -34,29 +34,9 @@ class JacobiPoint:
     ):
         if __debug__ and not self._curve_params:
             raise RuntimeError("Set JacobiPoint curve params first.")
-
-        if x is None:
-            # It is point at infinity.
-            self.x, self.y, self.z = None, FieldInt(1), None
-            return
-
         self.x = FieldInt(x)
         self.y = FieldInt(y)
         self.z = FieldInt(z)
-
-        if __debug__:
-            self.assert_on_curve()
-
-    def assert_on_curve(self):
-        if self.is_infinity():
-            return True
-
-        assert (
-            self.y * self.y * self.z
-            == self.x * self.x * self.x
-            + self._curve_params.a * self.x * self.z * self.z
-            + self._curve_params.b * self.z * self.z * self.z
-        ), f"{self} is not on curve."
 
     def __repr__(self):
         if self.is_infinity():
@@ -67,23 +47,24 @@ class JacobiPoint:
         if not isinstance(other, JacobiPoint):
             return NotImplemented
 
-        if self.is_infinity() and other.is_infinity():
-            return True
+        return self.x / (self.z ** 2) == other.x / (other.z ** 2) and self.y / (
+            self.z ** 3
+        ) == other.y / (other.z ** 3)
 
-        return (
-            self.x * other.z == other.x * self.z
-            and self.y * other.z == other.y * self.z
-        )
-
-    def __ne__(self, other: "JacobiPoint") -> bool:
+    def __ne__(self, other) -> bool:
         return not (self == other)
 
-    def __mul__(self, value: FieldInt) -> "JacobiPoint":
+    def __mul__(self, value) -> "JacobiPoint":
         if isinstance(value, int):
             value = FieldInt(value)
 
         if not isinstance(value, FieldInt):
             return NotImplemented
+
+        if value != 2:
+            raise ValueError(
+                "Only point doubling is supported. (multiplied by value != 2)"
+            )
 
         X_1 = self.x
         Y_1 = self.y
@@ -129,49 +110,3 @@ class JacobiPoint:
         Y_2 = (V * R - M * W * W * W) * FieldInt(2).inverse()
 
         return JacobiPoint(x=X_2, y=Y_2, z=Z_2)
-
-    def __radd__(self, other):
-        return self.__add__(other)
-
-    def __neg__(self):
-        if self.is_infinity():
-            return self
-        return JacobiPoint(x=self.x.value, y=-self.y.value, z=self.z.value)
-
-    def is_infinity(self):
-        return self.x is None and self.z is None
-
-    @classmethod
-    def get_infinity(cls):
-        if cls._inf:
-            return cls._inf
-        cls._inf = cls(None, 1, None)
-        return cls._inf
-
-    @classmethod
-    def get_base_point(cls):
-        # if cls._base_point:
-        # return cls._base_point
-        cls._base_point = cls._curve_params.base_point
-        return cls._base_point
-
-
-if __name__ == "__main__":
-    import argparse
-    import affine
-    import setup
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--gx", type=int, required=True, help="x of base Point")
-    parser.add_argument("--gy", type=int, required=True, help="y of base Point")
-    parser.add_argument("--path", type=str, required=True)
-    parser.add_argument("--stdin", action="store_true", default=False)
-    parser.add_argument(
-        "--R", type=int, required=True, help="Value by which to multiply affine point"
-    )
-    args = parser.parse_args()
-    setup.set_curve_params(args)
-
-    base = affine.AffinePoint(args.gx, args.gy).convert_to_projective_point()
-    exp = args.R
-    result = base * exp
