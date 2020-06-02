@@ -8,11 +8,13 @@ import setup
 import affine
 import projective
 import field
+import jacobi
 from shared import CurveBasePoint, CurveParams
 
+AffinePoint = affine.AffinePoint
 ProjectivePoint = projective.ProjectivePoint
 FieldInt = field.FieldInt
-PrecomputationCase = collections.namedtuple("PrecomputationCase", "R_bits S_max")
+JacobiPoint = jacobi.JacobiPoint
 
 
 def _setup_curve():
@@ -25,6 +27,7 @@ def _setup_curve():
     )
     affine.set_curve_params(curve_params)
     projective.set_curve_params(curve_params)
+    jacobi.set_curve_params(curve_params)
     field.set_modulus(curve_params.field_order)
 
 
@@ -33,21 +36,33 @@ class DoubleAndAddTests(unittest.TestCase):
     def setUpClass(cls):
         _setup_curve()
 
-    def test_operation(self):
+    def test_on_projective(self):
         # Arrange.
         for _ in range(100):
             k = random.getrandbits(40)
             with self.subTest(k):
                 base_point = ProjectivePoint.base()
                 expected_result = base_point * k
-                
+
                 # Act.
                 result = double_and_add.double_and_add(base_point, k)
 
                 # Assert.
                 self.assertEqual(expected_result, result)
 
+    def test_on_jacobi(self):
+        # Arrange.
+        # for _ in range(100):
+        k = random.getrandbits(40)
+        # with self.subTest(k):
+        expected_result = AffinePoint.base() * k
+        base_point = JacobiPoint.base()
 
+        # Act.
+        result = double_and_add.double_and_add(base_point, k)
+
+        # Assert.
+        self.assertEqual(expected_result, result.convert_to_affine_point())
 
 
 if __name__ == "__main__":

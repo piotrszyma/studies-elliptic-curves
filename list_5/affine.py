@@ -151,6 +151,12 @@ class AffinePoint:
         return FieldInt.random(2, cls._curve_params.curve_order)
 
     @classmethod
+    def base(cls):
+        return cls(
+            cls.get_base_point().x, cls.get_base_point().y
+        )
+
+    @classmethod
     def get_random_scalar(cls) -> FieldInt:
         return cls.get_random_number()
 

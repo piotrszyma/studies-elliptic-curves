@@ -37,6 +37,7 @@ def double_and_add(base_point, scalar):
             result += temp
         temp = temp * TWO
         field_value.value >>= 1
+
     return result
 
 

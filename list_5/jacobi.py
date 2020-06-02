@@ -63,7 +63,7 @@ class JacobiPoint:
 
         if value != 2:
             raise ValueError(
-                "Only point doubling is supported. (multiplied by value != 2)"
+                f"Only point doubling is supported. (multiplied by value equal {value} != 2)"
             )
 
         X_1 = self.x
@@ -110,3 +110,22 @@ class JacobiPoint:
         Y_2 = (V * R - M * W * W * W) * FieldInt(2).inverse()
 
         return JacobiPoint(x=X_2, y=Y_2, z=Z_2)
+
+    def get_infinity(self):
+        return JacobiPoint(x=FieldInt(1), y=FieldInt(1), z=FieldInt(0))
+
+    @classmethod
+    def base(cls):
+        return cls(
+            cls.get_base_point().x, cls.get_base_point().y, cls.get_base_point().z
+        )
+
+    @classmethod
+    def get_base_point(cls):
+        return cls._curve_params.base_point
+
+    def convert_to_affine_point(self):
+        return AffinePoint(
+            x=self.x * (self.z * self.z).inverse(), 
+            y=self.y * (self.z * self.z * self.z).inverse(),
+        )
