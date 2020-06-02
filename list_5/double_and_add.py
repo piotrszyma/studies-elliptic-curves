@@ -1,29 +1,23 @@
 import argparse
 import random
 from field import FieldInt
-import projective
+import jacobi
 import copy
 import setup
 
-ProjectivePoint = projective.ProjectivePoint
+JacobiPoint = jacobi.JacobiPoint
 
 
 def main(args):
     curve_params, bit_length = setup.set_curve_params(args)
     print(curve_params)
     k = args.k if args.k is not None else random.getrandbits(bit_length)
-    base_point = ProjectivePoint(
-        x=curve_params.base_point.x,
-        y=curve_params.base_point.y,
-        z=curve_params.base_point.z,
-    )
-    mul_point = base_point * k
+    base_point = JacobiPoint.base()
+    mul_point = base_point.convert_to_affine_point() * k
     print(f"k * G = {mul_point} k = {k} G = {base_point}")
-    # TODO: Convert ProjectivePoint to JacobianPoint
-    # TODO: Calculate double-and-add method.
     result = double_and_add(base_point, k)
-    print(result)
-    assert result == mul_point
+    assert result.convert_to_affine_point() == mul_point, "Failed to compute k * G."
+    print("Successfully computed k * G.")
 
 
 def double_and_add(base_point, scalar):

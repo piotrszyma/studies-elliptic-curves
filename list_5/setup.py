@@ -4,6 +4,7 @@ import shared
 import projective
 import field
 import affine
+import jacobi
 
 
 def _read_sage_params_from_file(file_path):
@@ -34,5 +35,6 @@ def set_curve_params(args):
     )
     projective.set_curve_params(curve_params)
     affine.set_curve_params(curve_params)
+    jacobi.set_curve_params(curve_params)
     field.set_modulus(field_order)
     return curve_params, int(raw_json["bitLength"])
