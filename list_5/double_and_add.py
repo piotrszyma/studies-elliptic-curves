@@ -27,14 +27,15 @@ def main(args):
 
 def double_and_add(base_point, scalar):
     TWO = FieldInt(2)
+    field_value = FieldInt(scalar)
     temp = copy.deepcopy(base_point)
     result = ProjectivePoint.get_infinity()
 
-    while scalar != 0:
-        if scalar & 1 != 0:
+    while field_value.value != 0:
+        if field_value.value & 1 != 0:
             result += temp
         temp = temp * TWO
-        scalar >>= 1
+        field_value.value >>= 1
 
     return result
 
