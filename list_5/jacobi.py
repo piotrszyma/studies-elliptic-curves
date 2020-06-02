@@ -74,7 +74,7 @@ class JacobiPoint:
         M = 3 * X_1 ** 2 + self._curve_params.a * Z_1 ** 4
         Z_2 = 2 * Y_1 * Z_1
         S = 4 * X_1 * Y_1 ** 2
-        X_2 = M**2 - 2 * S
+        X_2 = M ** 2 - 2 * S
         T = 8 * Y_1 ** 4
         Y_2 = M * (S - X_2) - T
 
@@ -92,6 +92,13 @@ class JacobiPoint:
 
         if other.is_infinity():
             return self
+
+        if self.x * (self.z ** 2).inverse() == other.x * (other.z ** 2).inverse():
+            print("HERE")
+            if self.y * (self.z ** 3).inverse() == other.y * (other.z ** 3).inverse():
+                return self * 2
+                print("HERE2")
+            return JacobiPoint.get_infinity()
 
         X_0 = self.x
         Y_0 = self.y
@@ -137,6 +144,5 @@ class JacobiPoint:
 
     def convert_to_affine_point(self):
         return AffinePoint(
-            x=self.x * (self.z ** 2).inverse(),
-            y=self.y * (self.z ** 3).inverse(),
+            x=self.x * (self.z ** 2).inverse(), y=self.y * (self.z ** 3).inverse(),
         )

@@ -50,6 +50,20 @@ class DoubleAndAddTests(unittest.TestCase):
                 # Assert.
                 self.assertEqual(expected_result, result)
 
+    def test_on_affine(self):
+        # Arrange.
+        for _ in range(100):
+            k = random.getrandbits(40)
+            with self.subTest(k):
+                base_point = AffinePoint.base()
+                expected_result = base_point * k
+
+                # Act.
+                result = double_and_add.double_and_add(base_point, k)
+
+                # Assert.
+                self.assertEqual(expected_result, result)
+
     def test_on_jacobi_multiple(self):
         # Arrange.
         for _ in range(100):

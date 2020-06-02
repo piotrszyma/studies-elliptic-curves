@@ -81,8 +81,8 @@ class AffinePoint:
         return self.x == other.x and self.y == other.y
 
     def __mul__(self, value: int) -> "AffinePoint":
-        if not isinstance(value, int):
-            raise NotImplementedError(f"Cannot multiply {type(self)} and {type(value)}")
+        if isinstance(value, FieldInt):
+            value = value.value
 
         if value == 2:  # TODO: migrate to Fields
             if self.is_infinity() or self.y == 0:
