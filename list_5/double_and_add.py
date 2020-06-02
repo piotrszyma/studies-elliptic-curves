@@ -10,6 +10,7 @@ ProjectivePoint = projective.ProjectivePoint
 
 def main(args):
     curve_params, bit_length = setup.set_curve_params(args)
+    print(curve_params)
     k = args.k if args.k is not None else random.getrandbits(bit_length)
     base_point = ProjectivePoint(
         x=curve_params.base_point.x,

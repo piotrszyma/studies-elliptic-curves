@@ -326,6 +326,12 @@ class ProjectivePoint:
         return base_point * random_value
 
     @classmethod
+    def base(cls):
+        return ProjectivePoint(
+            cls.get_base_point().x, cls.get_base_point().y, cls.get_base_point().z
+        )
+
+    @classmethod
     def get_random_number(cls):
         return FieldInt(random.randint(2, cls._curve_params.curve_order))
 
