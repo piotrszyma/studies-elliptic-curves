@@ -71,11 +71,11 @@ class JacobiPoint:
         Y_1 = self.y
         Z_1 = self.z
 
-        M = 3 * X_1 * X_1 + self._curve_params.a * Z_1 * Z_1 * Z_1 * Z_1
+        M = 3 * X_1 ** 2 + self._curve_params.a * Z_1 ** 4
         Z_2 = 2 * Y_1 * Z_1
-        S = 4 * X_1 * Y_1 * Y_1
-        X_2 = M * M - 2 * S
-        T = 8 * Y_1 * Y_1 * Y_1 * Y_1
+        S = 4 * X_1 * Y_1 ** 2
+        X_2 = M**2 - 2 * S
+        T = 8 * Y_1 ** 4
         Y_2 = M * (S - X_2) - T
 
         return JacobiPoint(x=X_2, y=Y_2, z=Z_2)
@@ -101,10 +101,10 @@ class JacobiPoint:
         Y_1 = other.y
         Z_1 = other.z
 
-        U_0 = X_0 * Z_1 * Z_1
-        S_0 = Y_0 * Z_1 * Z_1 * Z_1
-        U_1 = X_1 * Z_0 * Z_0
-        S_1 = Y_1 * Z_0 * Z_0 * Z_0
+        U_0 = X_0 * (Z_1 ** 2)
+        S_0 = Y_0 * (Z_1 ** 3)
+        U_1 = X_1 * (Z_0 ** 2)
+        S_1 = Y_1 * (Z_0 ** 3)
 
         W = U_0 - U_1
         R = S_0 - S_1
@@ -114,7 +114,7 @@ class JacobiPoint:
         Z_2 = W * Z_0 * Z_1
         X_2 = R * R - T * W * W
         V = T * W * W - 2 * X_2
-        Y_2 = (V * R - M * W * W * W) * FieldInt(2).inverse()
+        Y_2 = (V * R - M * W ** 3) * FieldInt(2).inverse()
 
         return JacobiPoint(x=X_2, y=Y_2, z=Z_2)
 
