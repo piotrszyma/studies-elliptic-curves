@@ -62,9 +62,10 @@ class JacobiPoint:
             return NotImplemented
 
         if value != 2:
-            raise ValueError(
-                f"Only point doubling is supported. (multiplied by value equal {value} != 2)"
-            )
+            raise ValueError(f"Only point doubling is supported. ({value} != 2)")
+
+        if self.is_infinity() or self.y.value == 0:
+            return self.get_infinity()
 
         X_1 = self.x
         Y_1 = self.y
@@ -136,6 +137,6 @@ class JacobiPoint:
 
     def convert_to_affine_point(self):
         return AffinePoint(
-            x=self.x * (self.z * self.z).inverse(), 
-            y=self.y * (self.z * self.z * self.z).inverse(),
+            x=self.x * (self.z ** 2).inverse(),
+            y=self.y * (self.z ** 3).inverse(),
         )
