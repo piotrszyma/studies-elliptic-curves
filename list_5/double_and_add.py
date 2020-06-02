@@ -28,7 +28,6 @@ def main(args):
 
 def double_and_add(base_point, scalar):
     TWO = FieldInt(2)
-    scalar = FieldInt(scalar) if isinstance(base_point, ProjectivePoint) else scalar
     temp = copy.deepcopy(base_point)
     result = base_point.get_infinity()
 

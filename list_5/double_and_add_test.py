@@ -36,20 +36,6 @@ class DoubleAndAddTests(unittest.TestCase):
     def setUpClass(cls):
         _setup_curve()
 
-    def test_on_projective(self):
-        # Arrange.
-        for _ in range(100):
-            k = random.getrandbits(40)
-            with self.subTest(k):
-                base_point = ProjectivePoint.base()
-                expected_result = base_point * k
-
-                # Act.
-                result = double_and_add.double_and_add(base_point, k)
-
-                # Assert.
-                self.assertEqual(expected_result, result)
-
     def test_on_affine(self):
         # Arrange.
         for _ in range(100):
@@ -77,18 +63,6 @@ class DoubleAndAddTests(unittest.TestCase):
 
                 # Assert.
                 self.assertEqual(expected_result, result.convert_to_affine_point())
-
-    def test_on_jacobi_single(self):
-        # Arrange.
-        k = 934784097119
-        expected_result = AffinePoint.base() * k
-        base_point = JacobiPoint.base()
-
-        # Act.
-        result = double_and_add.double_and_add(base_point, k)
-
-        # Assert.
-        self.assertEqual(expected_result, result.convert_to_affine_point())
 
 
 if __name__ == "__main__":
