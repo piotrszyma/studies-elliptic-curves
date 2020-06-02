@@ -34,9 +34,9 @@ class JacobiPoint:
     ):
         if __debug__ and not self._curve_params:
             raise RuntimeError("Set JacobiPoint curve params first.")
-        self.x = FieldInt(x)
+        self.x = FieldInt(x) if x is not None else None
         self.y = FieldInt(y)
-        self.z = FieldInt(z)
+        self.z = FieldInt(z) if z is not None else None
 
     def __repr__(self):
         if self.is_infinity():
@@ -86,6 +86,12 @@ class JacobiPoint:
         if not isinstance(other, JacobiPoint):
             return NotImplemented
 
+        if self.is_infinity():
+            return other
+
+        if other.is_infinity():
+            return self
+
         X_0 = self.x
         Y_0 = self.y
         Z_0 = self.z
@@ -111,8 +117,12 @@ class JacobiPoint:
 
         return JacobiPoint(x=X_2, y=Y_2, z=Z_2)
 
-    def get_infinity(self):
-        return JacobiPoint(x=FieldInt(1), y=FieldInt(1), z=FieldInt(0))
+    @classmethod
+    def get_infinity(cls):
+        return cls(None, 1, None)
+
+    def is_infinity(self):
+        return self.x is None and self.z is None
 
     @classmethod
     def base(cls):
