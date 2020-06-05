@@ -46,7 +46,7 @@ class DoubleAndAddTests(unittest.TestCase):
     def test_on_affine(self):
         # Arrange.
         for _ in range(100):
-            k = random.getrandbits(8)
+            k = random.getrandbits(40)
             with self.subTest(k):
                 base_point = AffinePoint.base()
                 expected_result = base_point * k
@@ -60,7 +60,7 @@ class DoubleAndAddTests(unittest.TestCase):
     def test_on_jacobi_multiple(self):
         # Arrange.
         for _ in range(100):
-            k = random.getrandbits(8)
+            k = random.getrandbits(40)
             with self.subTest(k):
                 expected_result = AffinePoint.base() * k
                 base_point = JacobiPoint.base()
