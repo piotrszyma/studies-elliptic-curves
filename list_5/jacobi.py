@@ -94,10 +94,8 @@ class JacobiPoint:
             return self
 
         if self.x * (self.z ** 2).inverse() == other.x * (other.z ** 2).inverse():
-            print("HERE")
             if self.y * (self.z ** 3).inverse() == other.y * (other.z ** 3).inverse():
                 return self * 2
-                print("HERE2")
             return JacobiPoint.get_infinity()
 
         X_0 = self.x
