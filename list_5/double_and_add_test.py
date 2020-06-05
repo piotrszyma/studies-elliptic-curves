@@ -19,12 +19,19 @@ JacobiPoint = jacobi.JacobiPoint
 
 def _setup_curve():
     curve_params = CurveParams(
-        base_point=CurveBasePoint(x=182, y=118, z=1),
-        a=1,
-        b=175,
-        curve_order=193,
-        field_order=197,
+        base_point=CurveBasePoint(x=247845205144, y=706036928873, z=1),
+        a=479578361930,
+        b=77472502557,
+        curve_order=846154605337,
+        field_order=846155904851,
     )
+    # curve_params = CurveParams(
+    #     base_point=CurveBasePoint(x=182, y=118, z=1),
+    #     a=1,
+    #     b=175,
+    #     curve_order=193,
+    #     field_order=197,
+    # )
     affine.set_curve_params(curve_params)
     projective.set_curve_params(curve_params)
     jacobi.set_curve_params(curve_params)
