@@ -19,11 +19,11 @@ JacobiPoint = jacobi.JacobiPoint
 
 def _setup_curve():
     curve_params = CurveParams(
-        base_point=CurveBasePoint(x=247845205144, y=706036928873, z=1),
-        a=479578361930,
-        b=77472502557,
-        curve_order=846154605337,
-        field_order=846155904851,
+        base_point=CurveBasePoint(x=182, y=118, z=1),
+        a=1,
+        b=175,
+        curve_order=193,
+        field_order=197,
     )
     affine.set_curve_params(curve_params)
     projective.set_curve_params(curve_params)
@@ -39,7 +39,7 @@ class DoubleAndAddTests(unittest.TestCase):
     def test_on_affine(self):
         # Arrange.
         for _ in range(100):
-            k = random.getrandbits(40)
+            k = random.getrandbits(8)
             with self.subTest(k):
                 base_point = AffinePoint.base()
                 expected_result = base_point * k
@@ -53,7 +53,7 @@ class DoubleAndAddTests(unittest.TestCase):
     def test_on_jacobi_multiple(self):
         # Arrange.
         for _ in range(100):
-            k = random.getrandbits(40)
+            k = random.getrandbits(8)
             with self.subTest(k):
                 expected_result = AffinePoint.base() * k
                 base_point = JacobiPoint.base()

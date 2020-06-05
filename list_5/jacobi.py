@@ -143,7 +143,7 @@ class JacobiPoint:
         return cls._curve_params.base_point
 
     def convert_to_affine_point(self):
-        if not self.x or not self.z:
+        if not self.x and not self.z:
             return AffinePoint.get_infinity()
         return AffinePoint(
             x=self.x * (self.z ** 2).inverse(), y=self.y * (self.z ** 3).inverse(),
