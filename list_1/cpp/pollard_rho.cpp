@@ -48,7 +48,16 @@ mpz_class pollard_rho_mpz(mpz_class *g_prim, mpz_class *p, mpz_class *p_prim, mp
   mpz_class betaDeltas = betaA - betaB;
   mpz_class p_primMinTwo = *p_prim - 2;
   mpz_powm(betasInv.get_mpz_t(), betaDeltas.get_mpz_t(), p_primMinTwo.get_mpz_t(), (*p_prim).get_mpz_t());
-  return ((alphaB - alphaA) * betasInv) % *p_prim;
+
+  if (alphaB < alphaA) {
+    alphaB += *p_prim;
+  }
+
+  mpz_class alphaDeltas = alphaB - alphaA;
+  std::cout << "alphaA: " << alphaA << std::endl;
+  std::cout << "alphaB: " << alphaB << std::endl;
+  std::cout << "alphaDeltas: " << alphaDeltas << std::endl;
+  return (alphaDeltas * betasInv) % *p_prim;
 }
 
 void run_pollard_rho_from_stdin()

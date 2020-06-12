@@ -55,17 +55,24 @@ class PollardRhoDL:
 
     def _f(self, values: Tuple[int, Point]) -> Tuple[int, Point]:
         value, poe = values
+        # print(f'value = {value}')
+        # print(f'alpha = {poe.alpha}')
+        # print(f'beta = {poe.beta}')
         if _in_s1(value):
+            # print("res % 3 == 1")
             poe.beta += 1
             poe.beta %= self.params.p_prim
             return (value * self.params.y) % self.params.p, poe
         elif _in_s2(value):
+            # print("res % 3 == 0")
             poe.alpha *= 2
             poe.alpha %= self.params.p_prim
             poe.beta *= 2
+            poe.alpha %= self.params.p_prim
             poe.beta %= self.params.p_prim
             return (value * value) % self.params.p, poe
         elif _in_s3(value):
+            # print("res % 3 == 2")
             poe.alpha += 1
             poe.alpha %= self.params.p_prim
             return (self.params.g_prim * value) % self.params.p, poe
@@ -85,9 +92,13 @@ class PollardRhoDL:
 
             if A == B:
                 break
+        
+        print(f'a = {A}')
+        print(f'b = {B}') 
 
         # x === ((alpha_2i - alpha_i) * ((beta_i - beta_2i) ^ (-1))) mod p_prim
-        b_invs = pow(poeA.beta - poeB.beta, self.params.p_prim - 2, self.params.p_prim)
+        betas_diff = poeA.beta - poeB.beta
+        b_invs = pow(betas_diff, self.params.p_prim - 2, self.params.p_prim)
         a_deltas = poeB.alpha - poeA.alpha
 
         # Return found x being DL such that g_prim ^ x = y mod p.
@@ -99,7 +110,7 @@ class PollardRhoDL:
 
 def main():
     params = generate_params()
-    print(f"Running for {params}")
+    # print(f"Running for {params}")
 
     instance = PollardRhoDL(params)
 
