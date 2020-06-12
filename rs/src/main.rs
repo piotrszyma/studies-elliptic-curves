@@ -14,16 +14,16 @@ fn step(
     // println!("alpha = {}", alpha);
     // println!("beta = {}", beta);
     let res: BigUint = value % BigUint::from(3 as u8);
-    if { res == BigUint::from(1 as u8) } {
+    if res == BigUint::from(1 as u8) {
         let new_beta = (beta + BigUint::from(1 as u8)) % p_prim;
         let new_value = (value * y) % p;
         (new_value, alpha.clone(), new_beta)
-    } else if { res == BigUint::from(0 as u8) } {
+    } else if res == BigUint::from(0 as u8) {
         let new_alpha = (alpha * BigUint::from(2 as u8)) % p_prim;
         let new_beta = (beta * BigUint::from(2 as u8)) % p_prim;
         let new_value = (value * value) % p;
         (new_value, new_alpha, new_beta)
-    } else if { res == BigUint::from(2 as u8) } {
+    } else if res == BigUint::from(2 as u8) {
         let new_alpha = (alpha + BigUint::from(1 as u8)) % p_prim;
         let new_value = (value * g_prim) % p;
         (new_value, new_alpha, beta.clone())
@@ -81,15 +81,14 @@ fn pollard_rho_mpz(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint)  ->
     // println!("b_alpha = {}", &b_alpha % &p_prim);
 
     let alphas_diffs: BigUint = {
-        if { b_alpha < a_alpha} {
+        if b_alpha < a_alpha {
             b_alpha + &p_prim - a_alpha
         } else {
             b_alpha - a_alpha
         }
     };
     let result = alphas_diffs * beta_diffs_inv;
-    let result_modulo = result % p_prim;
-    return result_modulo;
+    result % p_prim
 }
 
 fn main() {
