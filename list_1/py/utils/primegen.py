@@ -1,4 +1,3 @@
-import gensafeprime
 import subprocess
 import re
 
@@ -10,7 +9,8 @@ class FailedToCreatePrimeError:
 
 
 def random_safe_prime_from_gensafeprime(bits: int) -> int:
-    assert 40 <= bits <= 64
+    import gensafeprime
+    # assert 40 <= bits <= 64
     return gensafeprime.generate(bits)
 
 
