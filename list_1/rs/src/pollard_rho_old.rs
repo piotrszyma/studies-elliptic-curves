@@ -1,5 +1,4 @@
 use num_bigint::BigUint;
-use std::io;
 
 fn step(
     value: &BigUint,
@@ -7,8 +6,8 @@ fn step(
     beta: &BigUint,
     y: &BigUint,
     p: &BigUint,
-    p_prim: &BigUint, 
-    g_prim: &BigUint, 
+    p_prim: &BigUint,
+    g_prim: &BigUint,
 ) -> (BigUint, BigUint, BigUint) {
     // println!("value = {}", value);
     // println!("alpha = {}", alpha);
@@ -32,7 +31,7 @@ fn step(
     }
 }
 
-fn run(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint)  -> BigUint {
+pub fn run(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint) -> BigUint {
     println!("{}", g_prim);
     println!("{}", p);
     println!("{}", p_prim);
@@ -62,7 +61,6 @@ fn run(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint)  -> BigUint {
         b = result.0;
         b_alpha = result.1;
         b_beta = result.2;
-        
         if a == b {
             break;
         }
@@ -73,7 +71,13 @@ fn run(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint)  -> BigUint {
     // println!("b = {}", b);
     // println!("b_beta = {}", b_beta);
 
-    let betas_diffs = a_beta - b_beta;
+    let betas_diffs = {
+        if a_beta > b_beta {
+            a_beta - b_beta
+        } else {
+            a_beta + &p_prim - b_beta
+        }
+    };
     let p_prim_less_two = &p_prim - BigUint::from(2 as u8);
     let beta_diffs_inv = betas_diffs.modpow(&p_prim, &p_prim_less_two);
 
@@ -89,4 +93,40 @@ fn run(g_prim: BigUint, p: BigUint, p_prim: BigUint, y: BigUint)  -> BigUint {
     };
     let result = alphas_diffs * beta_diffs_inv;
     result % p_prim
+}
+
+#[cfg(test)]
+mod tests {
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn test_same_result_for_20_bits() {
+        // Arrange.
+        let g_prim = BigUint::parse_bytes(b"160965", 10).unwrap();
+        let p = BigUint::parse_bytes(b"900587", 10).unwrap();
+        let p_prim = BigUint::parse_bytes(b"450293", 10).unwrap();
+        let y = BigUint::parse_bytes(b"96620", 10).unwrap();
+
+        // Act.
+        let result = run(g_prim, p, p_prim, y);
+
+        // Assert.
+        assert_eq!(BigUint::parse_bytes(b"170878", 10).unwrap(), result);
+    }
+
+    #[test]
+    fn test_same_result_for_25_bits() {
+        // Arrange.
+        let g_prim = BigUint::parse_bytes(b"14324026", 10).unwrap();
+        let p = BigUint::parse_bytes(b"30564299", 10).unwrap();
+        let p_prim = BigUint::parse_bytes(b"15282149", 10).unwrap();
+        let y = BigUint::parse_bytes(b"22392548", 10).unwrap();
+
+        // Act.
+        let result = run(g_prim, p, p_prim, y);
+
+        // Assert.
+        assert_eq!(BigUint::parse_bytes(b"3023260", 10).unwrap(), result);
+    }
 }
