@@ -127,4 +127,20 @@ mod tests {
         // Assert.
         assert_eq!(BigUint::parse_bytes(b"3023260", 10).unwrap(), result);
     }
+
+    #[test]
+    #[ignore]
+    fn test_same_result_for_40_bits() {
+        // Arrange.
+        let g_prim = BigUint::parse_bytes(b"550859632345", 10).unwrap();
+        let p = BigUint::parse_bytes(b"944112437267", 10).unwrap();
+        let p_prim = BigUint::parse_bytes(b"472056218633", 10).unwrap();
+        let y = BigUint::parse_bytes(b"19459354526", 10).unwrap();
+
+        // Act.
+        let result = run(g_prim, p, p_prim, y);
+
+        // Assert.
+        assert_eq!(BigUint::parse_bytes(b"320531016627", 10).unwrap(), result);
+    }
 }

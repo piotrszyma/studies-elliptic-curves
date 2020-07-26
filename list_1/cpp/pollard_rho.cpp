@@ -1,5 +1,6 @@
 #include <iostream>
 #include <gmpxx.h>
+#include <chrono>
 
 namespace PollardRho
 {
@@ -75,7 +76,13 @@ void run_pollard_rho_from_stdin()
             << "y: " << y_str << std::endl;
 
   mpz_class g_prim(g_prim_str, 10), p(p_str, 10), p_prim(p_prim_str, 10), y(y_str, 10);
+  
+  auto start = std::chrono::high_resolution_clock::now();
   mpz_class x_found = pollard_rho_mpz(&g_prim, &p, &p_prim, &y);
+  auto finish = std::chrono::high_resolution_clock::now();
+
+  std::cout << "Found in " << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << " ns\n";
+
 
   std::cout << "x_found: " << x_found << std::endl;
 

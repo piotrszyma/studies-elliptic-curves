@@ -1,5 +1,7 @@
-use num_bigint::BigUint;
+use mod_exp::mod_exp;
 use std::io;
+use std::time::{Duration, Instant};
+
 
 mod pollard_rho;
 mod pollard_rho_biguint;
@@ -28,7 +30,19 @@ fn main() {
     println!("y = {}", y);
     input.clear();
 
-    let result = pollard_rho::run(g_prim, p, p_prim, y);
+    // dbg!(g_prim);
+    // dbg!(p);
+    // dbg!(p_prim);
+    // dbg!(y);
 
-    println!("result = {}", result)
+    let x_found = pollard_rho::run(g_prim, p, p_prim, y);
+
+    // Assert.
+    let start = Instant::now();
+    let y_calculated = mod_exp(g_prim, x_found, p);
+    println!("Found in {} ns", start.elapsed().as_nanos());
+
+    assert_eq!(y, y_calculated);
+
+    println!("x_found = {}", x_found)
 }

@@ -1,4 +1,3 @@
-use num_bigint::BigUint;
 use mod_exp::mod_exp;
 
 fn step(
@@ -32,28 +31,24 @@ fn step(
 }
 
 // TODO: Try to use those structures below.
-struct PollardRhoParams {
-    g_prim: u128,
-    p: u128,
-    p_prim: u128,
-    y: u128,
-}
+// struct PollardRhoParams {
+//     g_prim: u128,
+//     p: u128,
+//     p_prim: u128,
+//     y: u128,
+// }
 
-struct PollardRhoStepParams {
-    pollard_rho_params: PollardRhoParams,
-    a: u128,
-    b: u128,
-    a_alpha: u128,
-    a_beta: u128,
-    b_alpha: u128,
-    b_beta: u128,
-}
+// struct PollardRhoStepParams {
+//     pollard_rho_params: PollardRhoParams,
+//     a: u128,
+//     b: u128,
+//     a_alpha: u128,
+//     a_beta: u128,
+//     b_alpha: u128,
+//     b_beta: u128,
+// }
 
 pub fn run(g_prim: u128, p: u128, p_prim: u128, y: u128) -> u128 {
-    dbg!(g_prim);
-    dbg!(p);
-    dbg!(p_prim);
-    dbg!(y);
 
     let mut a = 1u128;
     let mut b = 1u128;
@@ -93,15 +88,7 @@ pub fn run(g_prim: u128, p: u128, p_prim: u128, y: u128) -> u128 {
         }
     };
     let p_prim_less_two = p_prim - 2;
-    // dbg!(betas_diffs);
-    // dbg!(p_prim);
-    // dbg!(p_prim_less_two);
-    let beta_diffs_inv = mod_exp(betas_diffs, p_prim, p_prim_less_two);
-    // dbg!(beta_diffs_inv);
-    // let beta_diffs_inv: u128 = BigUint::from(betas_diffs).modpow(&BigUint::from(p_prim), &BigUint::from(p_prim_less_two));
-
-    // println!("a_alpha = {}", &a_alpha % &p_prim);
-    // println!("b_alpha = {}", &b_alpha % &p_prim);
+    let beta_diffs_inv = mod_exp(betas_diffs, p_prim_less_two, p_prim);
 
     let alphas_diffs = {
         if b_alpha < a_alpha {
@@ -128,10 +115,11 @@ mod tests {
         let y = 96620 as u128;
 
         // Act.
-        let result = run(g_prim, p, p_prim, y);
+        let x_found = run(g_prim, p, p_prim, y);
 
         // Assert.
-        assert_eq!(170878 as u128, result);
+        let y_calculated = mod_exp(g_prim, x_found, p);
+        assert_eq!(y, y_calculated);
     }
 
     #[test]
@@ -143,9 +131,26 @@ mod tests {
         let y = 22392548 as u128;
 
         // Act.
-        let result = run(g_prim, p, p_prim, y);
+        let x_found = run(g_prim, p, p_prim, y);
 
         // Assert.
-        assert_eq!(3023260 as u128, result);
+        let y_calculated = mod_exp(g_prim, x_found, p);
+        assert_eq!(y, y_calculated);
+    }
+
+    #[test]
+    fn test_same_result_for_40_bits() {
+        // Arrange.
+        let g_prim = 550859632345 as u128;
+        let p = 944112437267 as u128;
+        let p_prim = 472056218633 as u128;
+        let y = 19459354526 as u128;
+
+        // Act.
+        let x_found = run(g_prim, p, p_prim, y);
+
+        // Assert.
+        let y_calculated = mod_exp(g_prim, x_found, p);
+        assert_eq!(y, y_calculated);
     }
 }

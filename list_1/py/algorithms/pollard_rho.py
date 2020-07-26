@@ -93,16 +93,18 @@ class PollardRhoDL:
             if A == B:
                 break
         
-        print(f'a = {A}')
-        print(f'b = {B}') 
+        # print(f'A = B = {A}')
+        # print(f'b = {B}') 
 
         # x === ((alpha_2i - alpha_i) * ((beta_i - beta_2i) ^ (-1))) mod p_prim
         betas_diff = poeA.beta - poeB.beta
-        b_invs = pow(betas_diff, self.params.p_prim - 2, self.params.p_prim)
-        a_deltas = poeB.alpha - poeA.alpha
 
+        print('betas_diff = ', betas_diff)
+        beta_diffs_inv = pow(betas_diff, self.params.p_prim - 2, self.params.p_prim)
+        a_deltas = poeB.alpha - poeA.alpha
+        print('beta_diffs_inv = ', beta_diffs_inv)
         # Return found x being DL such that g_prim ^ x = y mod p.
-        return a_deltas * b_invs % self.params.p_prim
+        return a_deltas * beta_diffs_inv % self.params.p_prim
 
     def run(self):
         return self._walk()
@@ -110,7 +112,7 @@ class PollardRhoDL:
 
 def main():
     params = generate_params()
-    # print(f"Running for {params}")
+    print(f"Running for {params}")
 
     instance = PollardRhoDL(params)
 

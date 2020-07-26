@@ -56,7 +56,7 @@ def main():
         x_found = pollard_rho.PollardRhoDL(params).run()
 
         print(f"x_found: {x_found}")
-        print(f"g_prim ^ x_found: {pow(params.g_prim, x_found, params.p)}")
+        print(f"g_prim ^ x_found % p: {pow(params.g_prim, x_found, params.p)}")
         print(f"y: {params.y}")
         return
 
