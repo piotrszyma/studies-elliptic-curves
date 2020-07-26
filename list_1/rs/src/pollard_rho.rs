@@ -31,10 +31,10 @@ fn step(
 }
 
 pub fn run(g_prim: u128, p: u128, p_prim: u128, y: u128) -> u128 {
-    println!("{}", g_prim);
-    println!("{}", p);
-    println!("{}", p_prim);
-    println!("{}", y);
+    dbg!(g_prim);
+    dbg!(p);
+    dbg!(p_prim);
+    dbg!(y);
 
     let mut a = 1u128;
     let mut b = 1u128;
