@@ -2,6 +2,7 @@ use num_bigint::BigUint;
 use std::io;
 
 mod pollard_rho;
+mod pollard_rho_biguint;
 
 fn main() {
     let stdin = io::stdin();

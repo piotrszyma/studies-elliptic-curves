@@ -1,4 +1,5 @@
 use num_bigint::BigUint;
+use mod_exp::mod_exp;
 
 fn step(
     value: u128,
@@ -9,7 +10,7 @@ fn step(
     p_prim: u128,
     g_prim: u128,
 ) -> (u128, u128, u128) {
-    match (value % 3) {
+    match value % 3 {
         1 => {
             let new_beta = (beta + 1) % p_prim;
             let new_value = (value * y) % p;
@@ -28,6 +29,24 @@ fn step(
         }
         _ => panic!("Value % 3 not in (0, 1, 2), something went wrong")
     }
+}
+
+// TODO: Try to use those structures below.
+struct PollardRhoParams {
+    g_prim: u128,
+    p: u128,
+    p_prim: u128,
+    y: u128,
+}
+
+struct PollardRhoStepParams {
+    pollard_rho_params: PollardRhoParams,
+    a: u128,
+    b: u128,
+    a_alpha: u128,
+    a_beta: u128,
+    b_alpha: u128,
+    b_beta: u128,
 }
 
 pub fn run(g_prim: u128, p: u128, p_prim: u128, y: u128) -> u128 {
@@ -74,7 +93,12 @@ pub fn run(g_prim: u128, p: u128, p_prim: u128, y: u128) -> u128 {
         }
     };
     let p_prim_less_two = p_prim - 2;
-    let beta_diffs_inv = (betas_diffs ^ p_prim) % p_prim_less_two;
+    // dbg!(betas_diffs);
+    // dbg!(p_prim);
+    // dbg!(p_prim_less_two);
+    let beta_diffs_inv = mod_exp(betas_diffs, p_prim, p_prim_less_two);
+    // dbg!(beta_diffs_inv);
+    // let beta_diffs_inv: u128 = BigUint::from(betas_diffs).modpow(&BigUint::from(p_prim), &BigUint::from(p_prim_less_two));
 
     // println!("a_alpha = {}", &a_alpha % &p_prim);
     // println!("b_alpha = {}", &b_alpha % &p_prim);
